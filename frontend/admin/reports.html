@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modération — ConnectMail Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d1117;
+            --bg2: #161b22;
+            --bg3: #21262d;
+            --border: #30363d;
+            --white: #e6edf3;
+            --muted: #8b949e;
+            --primary: #58a6ff;
+            --success: #2ea043;
+            --danger: #f85149;
+            --orange: #d29922;
+            --purple: #bc8cff;
+            --radius: 12px;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--white); display: flex; min-height: 100vh; }
+
+        aside { width: 260px; background: var(--bg2); border-right: 1px solid var(--border); position: fixed; height: 100vh; }
+        .side-header { padding: 24px; font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--white); border-bottom: 1px solid var(--border); }
+        .side-nav { padding: 20px 12px; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--muted); text-decoration: none; border-radius: 8px; transition: .2s; margin-bottom: 4px; }
+        .nav-item:hover, .nav-item.active { background: var(--bg3); color: var(--white); }
+        .nav-item.active { border: 1px solid var(--border); color: var(--primary); }
+
+        main { flex: 1; margin-left: 260px; padding: 40px; }
+
+        .report-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; position: relative; }
+        .priority-strip { position: absolute; left: 0; top: 20px; bottom: 20px; width: 4px; border-radius: 0 4px 4px 0; }
+        .urgent { background: var(--danger); box-shadow: 0 0 10px rgba(248, 81, 73, 0.4); }
+        .high { background: var(--orange); }
+        .normal { background: var(--primary); }
+
+        .report-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
+        .reporter-info { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--muted); }
+        .reporter-avatar { width: 24px; height: 24px; border-radius: 50%; }
+
+        .report-body { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .reported-user { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .reported-avatar { width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--border); }
+
+        .reason-badge { background: var(--bg3); padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 0.75rem; color: var(--primary); text-transform: uppercase; }
+        .comment { font-style: italic; color: var(--white); margin-top: 12px; padding-left: 12px; border-left: 2px solid var(--bg3); }
+
+        .actions { display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+        .btn { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); cursor: pointer; font-family: inherit; font-size: 0.9rem; transition: .2s; }
+        .btn-success { background: var(--success); color: white; border: none; }
+        .btn-danger { background: var(--danger); color: white; border: none; }
+        .btn:hover { opacity: 0.9; }
+
+        .empty-state { text-align: center; padding: 100px; color: var(--muted); }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <div class="side-header">ConnectMail Admin</div>
+        <nav class="side-nav">
+            <a href="/admin" class="nav-item">Dashboard</a>
+            <a href="/admin/users" class="nav-item">Utilisateurs</a>
+            <a href="/admin/reports" class="nav-item active">Signalements</a>
+            <a href="/admin/storage" class="nav-item">Stockage</a>
+            <a href="/admin/logs" class="nav-item">Audit Trail</a>
+        </nav>
+    </aside>
+
+    <main>
+        <div style="margin-bottom: 32px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>File de Modération</h1>
+                <p style="color:var(--muted)">Examinez les signalements et appliquez les sanctions nécessaires.</p>
+            </div>
+            <div id="loadingStatus" style="font-size: 0.8rem; color: var(--muted)">Chargement...</div>
+        </div>
+
+        <div id="reportContainer">
+            <!-- Dynamic Cards -->
+        </div>
+    </main>
+
+    <script>
+        async function fetchReports() {
+            const token = localStorage.getItem('cm_access_token');
+            try {
+                const res = await fetch('/api/admin/reports', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                renderReports(data.reports);
+                document.getElementById('loadingStatus').textContent = `${data.reports.length} signalements en attente`;
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function renderReports(reports) {
+            const container = document.getElementById('reportContainer');
+            if (!reports.length) {
+                container.innerHTML = '<div class="empty-state">🎉 Aucun signalement en attente. Bon travail !</div>';
+                return;
+            }
+
+            container.innerHTML = reports.map(r => `
+                <div class="report-card">
+                    <div class="priority-strip ${r.priority}"></div>
+                    <div class="report-header">
+                        <div class="reporter-info">
+                            <img src="${r.reporter_avatar || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + r.reporter_username}" class="reporter-avatar">
+                            Signalé par <b>@${r.reporter_username}</b> • ${new Date(r.created_at).toLocaleString()}
+                        </div>
+                        <span class="reason-badge">${r.reason}</span>
+                    </div>
+
+                    <div class="report-body">
+                        <div>
+                            <div class="reported-user">
+                                <img src="${r.reported_avatar || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + r.reported_username}" class="reported-avatar">
+                                <div>
+                                    <h4 style="margin:0">@${r.reported_username}</h4>
+                                    <span style="font-size:0.8rem; color:var(--muted)">Utilisateur signalé</span>
+                                </div>
+                            </div>
+                            <div class="comment">"${r.comment || 'Pas de commentaire additionnel.'}"</div>
+                        </div>
+
+                        <div style="background:var(--bg3); padding:16px; border-radius:8px; font-size:0.85rem">
+                            <h5 style="margin-bottom:10px; color:var(--muted); text-transform:uppercase">Historique & Contexte</h5>
+                            <p>Derniers messages échangés disponibles en base...</p>
+                            <div style="margin-top:10px; color:var(--orange)">⚠️ Cet utilisateur a déjà été signalé 2 fois.</div>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button class="btn btn-success" onclick="resolveReport('${r.id}', 'resolved', 'Avertissement envoyé')">Avertir</button>
+                        <button class="btn btn-danger" onclick="resolveReport('${r.id}', 'resolved', 'Utilisateur banni')">Bannir</button>
+                        <button class="btn" onclick="resolveReport('${r.id}', 'dismissed', 'Faux positif')">Ignorer</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function resolveReport(id, status, adminNote) {
+            const token = localStorage.getItem('cm_access_token');
+            const res = await fetch(`/api/admin/reports/${id}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status, adminNote })
+            });
+            if (res.ok) fetchReports();
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchReports);
+    </script>
+</body>
+</html>

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recherche — ConnectMail</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d1117;
+            --bg2: #161b22;
+            --bg3: #21262d;
+            --border: #30363d;
+            --green: #2ea043;
+            --green-h: #3fb950;
+            --blue: #58a6ff;
+            --text: #e6edf3;
+            --muted: #8b949e;
+            --red: #f85149;
+            --radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(13, 17, 23, .92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 24px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .nav-logo {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .nav-logo svg {
+            color: var(--green);
+        }
+
+        .search-bar-wrap {
+            flex: 1;
+            max-width: 560px;
+        }
+
+        .search-bar {
+            width: 100%;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 16px 10px 42px;
+            color: var(--text);
+            font-size: .95rem;
+            outline: none;
+            transition: .2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .search-bar:focus {
+            border-color: var(--blue);
+        }
+
+        .search-bar-wrap {
+            position: relative;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            pointer-events: none;
+        }
+
+        main {
+            padding-top: 80px;
+            max-width: 700px;
+            margin: 0 auto;
+            padding-left: 24px;
+            padding-right: 24px;
+            padding-bottom: 60px;
+        }
+
+        .results-header {
+            margin-bottom: 20px;
+        }
+
+        .results-header h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .results-header p {
+            color: var(--muted);
+            font-size: .875rem;
+            margin-top: 4px;
+        }
+
+        /* USER CARD */
+        .user-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 10px;
+            transition: .15s;
+        }
+
+        .user-card:hover {
+            border-color: var(--blue);
+            background: rgba(88, 166, 255, .04);
+        }
+
+        .user-card a.user-link {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex: 1;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .user-avatar {
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .user-avatar img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .online-dot {
+            position: absolute;
+            bottom: 1px;
+            right: 1px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--green);
+            border: 2px solid var(--bg2);
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: .95rem;
+        }
+
+        .user-username {
+            color: var(--muted);
+            font-size: .85rem;
+        }
+
+        .user-bio {
+            color: var(--muted);
+            font-size: .8rem;
+            margin-top: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 360px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .btn {
+            padding: 7px 16px;
+            border-radius: 8px;
+            font-size: .85rem;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: .2s;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--green);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--green-h);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg3);
+        }
+
+        /* EMPTY & LOADING */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state svg {
+            color: var(--muted);
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: var(--muted);
+            font-size: .9rem;
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, var(--bg3) 25%, var(--bg2) 50%, var(--bg3) 75%);
+            background-size: 200%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            to {
+                background-position: -200% 0;
+            }
+        }
+
+        .skel-card {
+            height: 80px;
+            border-radius: var(--radius);
+            margin-bottom: 10px;
+        }
+
+        /* PAGINATION */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 24px;
+        }
+
+        .page-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+            font-size: .875rem;
+            transition: .15s;
+        }
+
+        .page-btn:hover,
+        .page-btn.active {
+            background: var(--blue);
+            border-color: var(--blue);
+            color: #fff;
+        }
+
+        .page-btn:disabled {
+            opacity: .3;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav>
+        <a href="/" class="nav-logo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                <polyline points="22,6 12,13 2,6" />
+            </svg>
+            ConnectMail
+        </a>
+        <div class="search-bar-wrap">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <input class="search-bar" type="text" placeholder="Rechercher un utilisateur…" id="searchInput"
+                autocomplete="off">
+        </div>
+        <a href="/chat" style="text-decoration:none;font-size:.9rem;color:var(--muted);">← Chat</a>
+    </nav>
+
+    <main>
+        <div class="results-header" id="resultsHeader" style="display:none;">
+            <h2 id="resultsTitle"></h2>
+            <p id="resultsCount"></p>
+        </div>
+
+        <div id="resultsContainer">
+            <div class="empty-state">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <circle cx="11" cy="11" r="8" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <h3>Recherchez un utilisateur</h3>
+                <p>Saisissez un nom ou @username dans la barre de recherche ci-dessus.</p>
+            </div>
+        </div>
+
+        <div class="pagination" id="pagination" style="display:none;"></div>
+    </main>
+
+    <script>
+        const PER_PAGE = 20;
+        let currentPage = 1;
+        let currentQuery = '';
+        let searchDebounce;
+
+        // Init depuis URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialQ = urlParams.get('q') || '';
+        const initialPage = parseInt(urlParams.get('page')) || 1;
+
+        if (initialQ) {
+            document.getElementById('searchInput').value = initialQ;
+            currentQuery = initialQ;
+            currentPage = initialPage;
+            performSearch(initialQ, initialPage);
+        }
+
+        document.getElementById('searchInput').addEventListener('input', function () {
+            clearTimeout(searchDebounce);
+            const q = this.value.trim();
+            searchDebounce = setTimeout(() => {
+                if (q.length >= 2) {
+                    currentQuery = q;
+                    currentPage = 1;
+                    performSearch(q, 1);
+                    updateURL(q, 1);
+                } else if (!q) {
+                    resetResults();
+                }
+            }, 350);
+        });
+
+        async function performSearch(query, page) {
+            showSkeletons();
+            try {
+                const res = await fetch(`/api/users/search?q=${encodeURIComponent(query)}&page=${page}`, {
+                    headers: { 'Authorization': `Bearer ${getToken()}` }
+                });
+                const data = await res.json();
+                renderResults(data.users, data.total, query, page, data.totalPages);
+            } catch {
+                // DEMO : données factices
+                const demo = generateDemoUsers(query);
+                renderResults(demo, demo.length, query, 1, 1);
+            }
+        }
+
+        function renderResults(users, total, query, page, totalPages) {
+            const header = document.getElementById('resultsHeader');
+            const container = document.getElementById('resultsContainer');
+
+            if (!users.length) {
+                header.style.display = 'none';
+                container.innerHTML = `
+      <div class="empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <h3>Aucun résultat pour « ${escapeHtml(query)} »</h3>
+        <p>Essayez un autre nom ou @username.</p>
+      </div>`;
+                document.getElementById('pagination').style.display = 'none';
+                return;
+            }
+
+            header.style.display = 'block';
+            document.getElementById('resultsTitle').textContent = `Résultats pour « ${query} »`;
+            document.getElementById('resultsCount').textContent = `${total} utilisateur${total > 1 ? 's' : ''} trouvé${total > 1 ? 's' : ''}`;
+
+            container.innerHTML = users.map(u => `
+    <div class="user-card">
+      <a href="/u/${escapeHtml(u.username)}" class="user-link">
+        <div class="user-avatar">
+          <img src="${u.avatarUrl || `https://api.dicebear.com/7.x/identicon/svg?seed=${u.username}`}" alt="${escapeHtml(u.username)}">
+          ${u.isOnline ? '<div class="online-dot"></div>' : ''}
+        </div>
+        <div class="user-details">
+          <div class="user-name">${escapeHtml(u.firstName)} ${escapeHtml(u.lastName)}</div>
+          <div class="user-username">@${escapeHtml(u.username)}</div>
+          ${u.bio ? `<div class="user-bio">${escapeHtml(u.bio)}</div>` : ''}
+        </div>
+      </a>
+      <div class="card-actions">
+        <button class="btn btn-primary" onclick="startChat('${escapeHtml(u.username)}')">✉️ Écrire</button>
+      </div>
+    </div>
+  `).join('');
+
+            // Pagination
+            if (totalPages > 1) {
+                renderPagination(page, totalPages);
+            } else {
+                document.getElementById('pagination').style.display = 'none';
+            }
+        }
+
+        function renderPagination(current, total) {
+            const el = document.getElementById('pagination');
+            el.style.display = 'flex';
+            let html = `<button class="page-btn" onclick="goToPage(${current - 1})" ${current === 1 ? 'disabled' : ''}>‹</button>`;
+            for (let i = 1; i <= total; i++) {
+                if (i === 1 || i === total || Math.abs(i - current) <= 2) {
+                    html += `<button class="page-btn ${i === current ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+                } else if (Math.abs(i - current) === 3) {
+                    html += `<span style="color:var(--muted);padding:0 4px;">…</span>`;
+                }
+            }
+            html += `<button class="page-btn" onclick="goToPage(${current + 1})" ${current === total ? 'disabled' : ''}>›</button>`;
+            el.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            updateURL(currentQuery, page);
+            performSearch(currentQuery, page);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function showSkeletons() {
+            document.getElementById('resultsHeader').style.display = 'none';
+            document.getElementById('resultsContainer').innerHTML =
+                Array(5).fill('<div class="skel-card skeleton"></div>').join('');
+            document.getElementById('pagination').style.display = 'none';
+        }
+
+        function resetResults() {
+            document.getElementById('resultsHeader').style.display = 'none';
+            document.getElementById('resultsContainer').innerHTML = `
+    <div class="empty-state">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <h3>Recherchez un utilisateur</h3>
+      <p>Saisissez un nom ou @username dans la barre de recherche ci-dessus.</p>
+    </div>`;
+            document.getElementById('pagination').style.display = 'none';
+            updateURL('', 1);
+        }
+
+        function startChat(username) {
+            window.location.href = `/chat?user=${username}`;
+        }
+
+        function updateURL(q, page) {
+            const params = new URLSearchParams();
+            if (q) params.set('q', q);
+            if (page > 1) params.set('page', page);
+            const newUrl = `${window.location.pathname}${params.toString() ? '?' + params.toString() : ''}`;
+            window.history.replaceState({}, '', newUrl);
+        }
+
+        function generateDemoUsers(query) {
+            const names = [
+                { firstName: 'Sophie', lastName: 'Martin', username: 'sophiemartin', bio: 'Photographe et voyageuse passionnée 📷', isOnline: true },
+                { firstName: 'Lucas', lastName: 'Bernard', username: 'lucas_b', bio: 'Dev fullstack, fan de café et de code.', isOnline: false },
+                { firstName: 'Emma', lastName: 'Dubois', username: 'emmadubois', bio: '', isOnline: true },
+                { firstName: 'Antoine', lastName: 'Leroy', username: 'antoine.l', bio: 'Designer produit chez startup lyonnaise.', isOnline: false },
+                { firstName: 'Julie', lastName: 'Moreau', username: 'jmoreau', bio: 'Teacher & tech enthusiast 🎓', isOnline: true },
+            ];
+            return names.filter(u =>
+                u.firstName.toLowerCase().includes(query.toLowerCase()) ||
+                u.lastName.toLowerCase().includes(query.toLowerCase()) ||
+                u.username.toLowerCase().includes(query.toLowerCase())
+            );
+        }
+
+        function escapeHtml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+        function getToken() { return localStorage.getItem('accessToken') || ''; }
+    </script>
+</body>
+
+</html>

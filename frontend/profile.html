@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profil — ConnectMail</title>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0b0f;--bg2:#0f1117;--bg3:#141720;--surface:#181c28;--s2:#1e2335;--s3:#242b40;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);--accent:#6366f1;--accent2:#818cf8;--ag:rgba(99,102,241,0.12);--green:#10b981;--red:#f43f5e;--text:#e2e8f8;--text2:#7c88a8;--text3:#454f6b;--r:12px;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Familjen Grotesk',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+nav{position:sticky;top:0;z-index:50;height:52px;background:rgba(10,11,15,0.92);backdrop-filter:blur(12px);border-bottom:0.5px solid var(--border);display:flex;align-items:center;padding:0 5%;gap:12px}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.nav-icon{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff;box-shadow:0 0 14px rgba(99,102,241,0.4)}
+.nav-name{font-weight:700;font-size:16px;color:var(--text);letter-spacing:-.02em}
+.nav-back{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:14px;color:var(--text2);text-decoration:none;padding:6px 12px;border-radius:8px;transition:all .2s}
+.nav-back:hover{color:var(--text);background:var(--surface)}
+.banner{position:relative;height:200px;overflow:hidden;background:linear-gradient(135deg,#1e1060 0%,#0e1a50 50%,#080f22 100%)}
+.banner::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");pointer-events:none}
+.banner::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(10,11,15,0.85) 100%)}
+.banner-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+.wrap{max-width:720px;margin:0 auto;padding:0 24px 60px}
+.profile-header{position:relative;margin-top:-52px;margin-bottom:24px;display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap}
+.av-wrap{position:relative;flex-shrink:0}
+.av{width:104px;height:104px;border-radius:50%;border:4px solid var(--bg);display:flex;align-items:center;justify-content:center;font-family:'Instrument Serif',serif;font-style:italic;font-size:36px;color:#fff;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,0.5)}
+.av img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.online-dot{position:absolute;bottom:5px;right:5px;width:17px;height:17px;border-radius:50%;background:var(--green);border:3px solid var(--bg);box-shadow:0 0 8px rgba(16,185,129,0.5);display:none}
+.p-info{flex:1;padding-bottom:6px;min-width:200px}
+.p-name{font-family:'Instrument Serif',serif;font-style:italic;font-size:26px;color:var(--text);margin-bottom:2px}
+.p-user{font-size:14px;color:var(--text2)}
+.p-since{font-size:12px;color:var(--text3);margin-top:5px}
+.p-actions{display:flex;gap:8px;align-items:center;padding-bottom:6px;flex-shrink:0}
+.btn-msg{padding:9px 18px;border-radius:var(--r);background:var(--accent);color:#fff;border:none;font-family:'Familjen Grotesk',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
+.btn-msg:hover{background:#4f46e5;transform:translateY(-1px);box-shadow:0 6px 20px rgba(99,102,241,0.4)}
+.btn-edit{padding:9px 18px;border-radius:var(--r);background:transparent;color:var(--text2);border:0.5px solid var(--border2);font-family:'Familjen Grotesk',sans-serif;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-edit:hover{background:var(--surface);color:var(--text)}
+.btn-more{width:38px;height:38px;border-radius:var(--r);background:transparent;color:var(--text2);border:0.5px solid var(--border2);cursor:pointer;transition:all .2s;position:relative;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.btn-more:hover{background:var(--surface)}
+.dropdown{position:absolute;top:calc(100% + 6px);right:0;background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--r);padding:6px;min-width:185px;box-shadow:0 16px 40px rgba(0,0,0,0.45);display:none;z-index:30}
+.dropdown.open{display:block}
+.dd-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;font-size:13px;color:var(--text2);cursor:pointer;transition:all .15s;background:none;border:none;width:100%;text-align:left;font-family:'Familjen Grotesk',sans-serif}
+.dd-item:hover{background:var(--s2);color:var(--text)}
+.dd-item.danger:hover{background:rgba(244,63,94,0.1);color:var(--red)}
+.dd-sep{height:0.5px;background:var(--border);margin:4px 0}
+.p-bio{font-size:15px;color:var(--text2);line-height:1.7;margin-bottom:20px;max-width:520px}
+.p-meta{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:32px}
+.meta-i{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text3)}
+.blocked-box{text-align:center;padding:64px 20px}
+.blocked-icon{font-size:52px;opacity:.35;margin-bottom:14px}
+.blocked-title{font-size:18px;font-weight:600;color:var(--text2);margin-bottom:6px}
+.blocked-desc{font-size:14px;color:var(--text3)}
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 18px;border-radius:var(--r);font-size:14px;font-weight:500;z-index:300;display:none;animation:tIn .3s ease}
+.toast.show{display:block}
+.toast.success{background:#064e3b;border:0.5px solid rgba(16,185,129,0.3);color:var(--green)}
+.toast.error{background:#4c0519;border:0.5px solid rgba(244,63,94,0.3);color:var(--red)}
+@keyframes tIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:none;align-items:center;justify-content:center}
+.overlay.show{display:flex}
+.modal{background:var(--surface);border:0.5px solid var(--border2);border-radius:16px;padding:28px;width:380px;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.modal h3{font-family:'Instrument Serif',serif;font-style:italic;font-size:22px;margin-bottom:6px}
+.modal p{font-size:14px;color:var(--text2);margin-bottom:20px;line-height:1.6}
+.modal label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.modal select,.modal textarea{width:100%;padding:10px 12px;background:var(--bg2);border:0.5px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:'Familjen Grotesk',sans-serif;font-size:14px;outline:none;margin-bottom:14px}
+.modal textarea{height:90px;resize:none}
+.modal-btns{display:flex;gap:10px}
+.btn-cancel{flex:1;padding:10px;background:transparent;border:0.5px solid var(--border2);border-radius:var(--r);color:var(--text2);font-family:'Familjen Grotesk',sans-serif;cursor:pointer;transition:all .2s}
+.btn-cancel:hover{background:var(--s2)}
+.btn-submit{flex:1;padding:10px;background:var(--red);border:none;border-radius:var(--r);color:#fff;font-family:'Familjen Grotesk',sans-serif;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-submit:hover{background:#e11d48}
+.sk{background:linear-gradient(90deg,var(--surface) 25%,var(--s2) 50%,var(--surface) 75%);background-size:200%;animation:sk 1.5s infinite;border-radius:6px}
+@keyframes sk{0%{background-position:200% 0}100%{background-position:-200% 0}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/chat.html" class="nav-logo"><div class="nav-icon">C</div><div class="nav-name">ConnectMail</div></a>
+  <a href="/chat.html" class="nav-back">← Messages</a>
+</nav>
+
+<div class="banner"><img id="bannerImg" alt=""></div>
+
+<div class="wrap">
+  <div id="skeleton">
+    <div class="profile-header">
+      <div class="av-wrap"><div class="av sk" style="border:4px solid var(--bg)"></div></div>
+      <div style="flex:1;padding-bottom:6px">
+        <div class="sk" style="height:22px;width:180px;margin-bottom:8px"></div>
+        <div class="sk" style="height:14px;width:110px"></div>
+      </div>
+      <div style="display:flex;gap:8px;padding-bottom:6px">
+        <div class="sk" style="height:38px;width:140px;border-radius:12px"></div>
+        <div class="sk" style="height:38px;width:38px;border-radius:12px"></div>
+      </div>
+    </div>
+    <div class="sk" style="height:14px;width:90%;margin-bottom:8px"></div>
+    <div class="sk" style="height:14px;width:65%"></div>
+  </div>
+
+  <div id="profileContent" style="display:none">
+    <div id="blockedBox" class="blocked-box" style="display:none">
+      <div class="blocked-icon">🚫</div>
+      <div class="blocked-title">Profil non disponible</div>
+      <div class="blocked-desc">Ce profil ne peut pas être consulté.</div>
+    </div>
+    <div id="normalBox">
+      <div class="profile-header">
+        <div class="av-wrap">
+          <div class="av" id="pAvatar"></div>
+          <div class="online-dot" id="onlineDot"></div>
+        </div>
+        <div class="p-info">
+          <div class="p-name" id="pName"></div>
+          <div class="p-user" id="pUser"></div>
+          <div class="p-since" id="pSince"></div>
+        </div>
+        <div class="p-actions" id="pActions"></div>
+      </div>
+      <div class="p-bio" id="pBio" style="display:none"></div>
+      <div class="p-meta" id="pMeta"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="reportModal">
+  <div class="modal">
+    <h3>Signaler ce profil</h3>
+    <p>Votre signalement sera examiné par notre équipe.</p>
+    <label>Motif</label>
+    <select id="reportReason">
+      <option value="spam">Spam</option>
+      <option value="harassment">Harcèlement</option>
+      <option value="inappropriate">Contenu inapproprié</option>
+      <option value="fake_profile">Faux profil</option>
+      <option value="other">Autre</option>
+    </select>
+    <label>Commentaire (optionnel)</label>
+    <textarea id="reportComment" placeholder="Décrivez le problème..."></textarea>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeReport()">Annuler</button>
+      <button class="btn-submit" onclick="submitReport()">Envoyer</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API='/api', token=localStorage.getItem('accessToken');
+if(!token) location.href='/login.html';
+const params=new URLSearchParams(location.search), username=params.get('u');
+if(!username) location.href='/chat.html';
+let profileUser=null,currentUser=null;
+
+async function init(){
+  try{
+    const [meRes,pRes]=await Promise.all([apiFetch(`${API}/auth/me`),apiFetch(`${API}/users/${username}`)]);
+    currentUser=await meRes.json();
+    const u=await pRes.json();
+    document.getElementById('skeleton').style.display='none';
+    document.getElementById('profileContent').style.display='block';
+    if(u.is_blocked_by_me||u.has_blocked_me){document.getElementById('blockedBox').style.display='block';document.getElementById('normalBox').style.display='none';}
+    else{profileUser=u;renderProfile(u);}
+  }catch{showToast('Profil introuvable.','error');setTimeout(()=>location.href='/chat.html',2000);}
+}
+
+function renderProfile(u){
+  document.title=`${u.first_name} ${u.last_name} — ConnectMail`;
+  if(u.banner_url){const i=document.getElementById('bannerImg');i.src=u.banner_url;i.style.display='block';}
+  const av=document.getElementById('pAvatar');
+  av.style.background=strColor(u.username);
+  av.innerHTML=u.avatar_url?`<img src="${u.avatar_url}" alt="">`:((u.first_name?.[0]||'')+(u.last_name?.[0]||'')).toUpperCase();
+  if(u.is_online) document.getElementById('onlineDot').style.display='block';
+  document.getElementById('pName').textContent=`${u.first_name} ${u.last_name}`;
+  document.getElementById('pUser').textContent=`@${u.username}`;
+  document.getElementById('pSince').textContent=`Membre depuis ${new Date(u.created_at).toLocaleDateString('fr',{month:'long',year:'numeric'})}`;
+  if(u.bio){const b=document.getElementById('pBio');b.textContent=u.bio;b.style.display='block';}
+  const meta=document.getElementById('pMeta'),items=[];
+  if(u.location) items.push(`<div class="meta-i">📍 ${esc(u.location)}</div>`);
+  if(u.is_online) items.push(`<div class="meta-i">🟢 En ligne</div>`);
+  else if(u.last_seen_at) items.push(`<div class="meta-i">🕐 Vu ${ago(u.last_seen_at)}</div>`);
+  meta.innerHTML=items.join('');
+  renderActions(u);
+}
+
+function renderActions(u){
+  const c=document.getElementById('pActions');
+  if(u.id===currentUser?.id){c.innerHTML=`<button class="btn-edit" onclick="location.href='/settings.html'">✏️ Modifier</button>`;return;}
+  c.innerHTML=`<button class="btn-msg" onclick="startConv('${u.id}')">💬 Écrire</button>
+  <div style="position:relative">
+    <button class="btn-more" id="moreBtn" onclick="toggleDD()">⋯</button>
+    <div class="dropdown" id="dd">
+      <button class="dd-item" onclick="blockUser('${u.id}')">🚫 Bloquer @${esc(u.username)}</button>
+      <div class="dd-sep"></div>
+      <button class="dd-item danger" onclick="openReport()">⚠️ Signaler</button>
+    </div>
+  </div>`;
+}
+
+async function startConv(userId){
+  try{
+    const res=await apiFetch(`${API}/conversations`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId})});
+    const c=await res.json();
+    location.href=`/chat.html?conv=${c.id}`;
+  }catch{showToast('Erreur.','error');}
+}
+
+async function blockUser(userId){
+  closeDD();
+  if(!confirm(`Bloquer ${profileUser?.first_name} ?`)) return;
+  try{
+    await apiFetch(`${API}/users/${userId}/block`,{method:'POST'});
+    showToast(`@${profileUser?.username} bloqué.`,'success');
+    setTimeout(()=>location.href='/chat.html',1500);
+  }catch{showToast('Erreur.','error');}
+}
+
+function toggleDD(){document.getElementById('dd').classList.toggle('open');}
+function closeDD(){document.getElementById('dd')?.classList.remove('open');}
+document.addEventListener('click',e=>{if(!e.target.closest('#moreBtn')&&!e.target.closest('#dd')) closeDD();});
+function openReport(){closeDD();document.getElementById('reportModal').classList.add('show');}
+function closeReport(){document.getElementById('reportModal').classList.remove('show');}
+
+async function submitReport(){
+  const reason=document.getElementById('reportReason').value;
+  const comment=document.getElementById('reportComment').value.trim();
+  try{
+    await apiFetch(`${API}/users/${profileUser.id}/report`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reason,comment})});
+    closeReport();showToast('Signalement envoyé.','success');
+  }catch{showToast('Erreur.','error');}
+}
+
+async function apiFetch(url,opts={}){
+  const res=await fetch(url,{...opts,headers:{'Authorization':`Bearer ${token}`,...(opts.headers||{})}});
+  if(res.status===401) location.href='/login.html';
+  if(!res.ok&&res.status!==404) throw new Error(`HTTP ${res.status}`);
+  return res;
+}
+function showToast(msg,type){const e=document.getElementById('toast');e.textContent=msg;e.className=`toast ${type} show`;setTimeout(()=>e.classList.remove('show'),3500);}
+function strColor(s){const p=['#1e1b4b','#1a2744','#1a3a2e','#3b1a2e','#1a3030','#2d1a0e','#0e2233','#2a0e33'];let h=0;for(let c of s)h=c.charCodeAt(0)+((h<<5)-h);return p[Math.abs(h)%p.length];}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function ago(iso){const d=Math.floor((Date.now()-new Date(iso))/1000);if(d<60)return 'à l\'instant';if(d<3600)return `il y a ${Math.floor(d/60)} min`;if(d<86400)return `il y a ${Math.floor(d/3600)}h`;return `il y a ${Math.floor(d/86400)} j`;}
+init();
+</script>
+</body>
+</html>

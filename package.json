@@ -1,0 +1,10 @@
+{
+  "name": "connectmail-root",
+  "version": "1.0.0",
+  "description": "Root for ConnectMail project",
+  "scripts": {
+    "dev": "cd backend && npm run dev",
+    "start": "cd backend && npm start",
+    "test": "cd backend && npm test"
+  }
+}

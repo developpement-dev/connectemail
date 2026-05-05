@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des Utilisateurs — ConnectMail Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d1117;
+            --bg2: #161b22;
+            --bg3: #21262d;
+            --border: #30363d;
+            --white: #e6edf3;
+            --muted: #8b949e;
+            --primary: #58a6ff;
+            --success: #2ea043;
+            --danger: #f85149;
+            --orange: #d29922;
+            --radius: 12px;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--white); display: flex; min-height: 100vh; }
+
+        aside {
+            width: 260px;
+            background: var(--bg2);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+        }
+
+        .side-header { padding: 24px; font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 700; color: var(--white); border-bottom: 1px solid var(--border); }
+        .side-nav { padding: 20px 12px; flex: 1; }
+        .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: var(--muted); text-decoration: none; border-radius: 8px; transition: .2s; margin-bottom: 4px; }
+        .nav-item:hover, .nav-item.active { background: var(--bg3); color: var(--white); }
+        .nav-item.active { border: 1px solid var(--border); color: var(--primary); }
+
+        main { flex: 1; margin-left: 260px; padding: 40px; }
+
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 16px; }
+        .search-bar { flex: 1; position: relative; }
+        .search-bar input { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; color: var(--white); outline: none; transition: .2s; }
+        .search-bar input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1); }
+
+        .filters { display: flex; gap: 12px; }
+        .filters select { background: var(--bg2); border: 1px solid var(--border); color: var(--white); border-radius: 8px; padding: 8px 12px; outline: none; }
+
+        /* TABLE */
+        .table-container { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { padding: 16px; background: var(--bg3); font-size: 0.85rem; color: var(--muted); text-transform: uppercase; font-weight: 600; border-bottom: 1px solid var(--border); }
+        td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        
+        .user-cell { display: flex; align-items: center; gap: 12px; }
+        .user-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: var(--bg3); }
+        .user-info { display: flex; flex-direction: column; }
+        .user-info .name { font-weight: 600; }
+        .user-info .username { color: var(--muted); font-size: 0.8rem; }
+
+        .status-pill { padding: 4px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .status-active { background: rgba(46, 160, 67, 0.15); color: var(--success); }
+        .status-banned { background: rgba(248, 81, 73, 0.15); color: var(--danger); }
+        .status-mod { background: rgba(88, 166, 255, 0.15); color: var(--primary); }
+
+        .actions { display: flex; gap: 8px; }
+        .btn-icon { background: none; border: 1px solid var(--border); color: var(--muted); border-radius: 6px; width: 32px; height: 32px; cursor: pointer; transition: .2s; }
+        .btn-icon:hover { border-color: var(--white); color: var(--white); }
+        .btn-icon.danger:hover { background: var(--danger); border-color: var(--danger); }
+        .btn-icon.success:hover { background: var(--success); border-color: var(--success); }
+
+        .pagination { display: flex; justify-content: center; gap: 8px; margin-top: 24px; }
+        .page-btn { padding: 8px 12px; background: var(--bg2); border: 1px solid var(--border); color: var(--white); border-radius: 6px; cursor: pointer; }
+        .page-btn:hover { background: var(--bg3); }
+        .page-btn.active { background: var(--primary); border-color: var(--primary); color: white; }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <div class="side-header">ConnectMail Admin</div>
+        <nav class="side-nav">
+            <a href="/admin" class="nav-item">Dashboard</a>
+            <a href="/admin/users" class="nav-item active">Utilisateurs</a>
+            <a href="/admin/reports" class="nav-item">Signalements</a>
+            <a href="/admin/storage" class="nav-item">Stockage</a>
+            <a href="/admin/logs" class="nav-item">Audit Trail</a>
+        </nav>
+    </aside>
+
+    <main>
+        <div style="margin-bottom: 32px;">
+            <h1>Utilisateurs</h1>
+            <p style="color:var(--muted)">Gérez les membres de la communauté et appliquez des sanctions.</p>
+        </div>
+
+        <div class="toolbar">
+            <div class="search-bar">
+                <input type="text" placeholder="Rechercher par nom, @username ou email..." id="userSearch">
+            </div>
+            <div class="filters">
+                <select id="statusFilter">
+                    <option value="all">Tous les statuts</option>
+                    <option value="active">Actifs</option>
+                    <option value="banned">Bannis</option>
+                    <option value="deleted">Supprimés</option>
+                </select>
+                <button class="page-btn" style="background:var(--bg3)">Export CSV</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Utilisateur</th>
+                        <th>Email</th>
+                        <th>Inscrit le</th>
+                        <th>Dernière Connexion</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <!-- Dynamic Rows -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination" id="pagination">
+            <button class="page-btn">Précédent</button>
+            <button class="page-btn active">1</button>
+            <button class="page-btn">Suivant</button>
+        </div>
+    </main>
+
+    <script>
+        async function fetchUsers() {
+            const token = localStorage.getItem('cm_access_token');
+            const status = document.getElementById('statusFilter').value;
+            const q = document.getElementById('userSearch').value;
+
+            try {
+                const res = await fetch(`/api/admin/users?status=${status}&q=${q}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                renderUsers(data.users);
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function renderUsers(users) {
+            const body = document.getElementById('userTableBody');
+            body.innerHTML = users.map(u => `
+                <tr>
+                    <td>
+                        <div class="user-cell">
+                            <img src="${u.avatar_url || 'https://api.dicebear.com/7.x/identicon/svg?seed=' + u.username}" class="user-avatar">
+                            <div class="user-info">
+                                <span class="name">${u.first_name} ${u.last_name} ${u.is_admin ? '<span class="status-pill status-mod" style="margin-left:4px; font-size:10px">ADM</span>' : ''}</span>
+                                <span class="username">@${u.username}</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${u.email}</td>
+                    <td style="color:var(--muted); font-size:0.8rem;">${new Date(u.created_at).toLocaleDateString('fr-FR')}</td>
+                    <td style="color:var(--muted); font-size:0.8rem;">${u.last_seen_at ? new Date(u.last_seen_at).toLocaleDateString('fr-FR', {hour:'2-digit', minute:'2-digit'}) : 'Jamais'}</td>
+                    <td>
+                        <span class="status-pill ${u.status === 'active' ? 'status-active' : 'status-banned'}">
+                            ${u.status === 'active' ? 'ACTIF' : 'BANNI'}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn-icon" title="Voir détails">👁️</button>
+                            ${u.status === 'active' 
+                                ? `<button class="btn-icon danger" onclick="banUser('${u.id}')" title="Bannir">🚫</button>`
+                                : `<button class="btn-icon success" onclick="unbanUser('${u.id}')" title="Débannir">🔓</button>`
+                            }
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function banUser(id) {
+            if (!confirm('Voulez-vous vraiment bannir cet utilisateur ?')) return;
+            const reason = prompt('Motif du bannissement :');
+            if (!reason) return;
+
+            const token = localStorage.getItem('cm_access_token');
+            const res = await fetch(`/api/admin/users/${id}/ban`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reason })
+            });
+            if (res.ok) fetchUsers();
+        }
+
+        async function unbanUser(id) {
+            const token = localStorage.getItem('cm_access_token');
+            const res = await fetch(`/api/admin/users/${id}/unban`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) fetchUsers();
+        }
+
+        document.getElementById('statusFilter').addEventListener('change', fetchUsers);
+        document.getElementById('userSearch').addEventListener('input', fetchUsers);
+        document.addEventListener('DOMContentLoaded', fetchUsers);
+    </script>
+</body>
+</html>

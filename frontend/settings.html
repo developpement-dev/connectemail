@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Paramètres — ConnectMail</title>
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0b0f;--bg2:#0f1117;--surface:#181c28;--s2:#1e2335;--s3:#242b40;--border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);--accent:#6366f1;--green:#10b981;--red:#f43f5e;--text:#e2e8f8;--text2:#7c88a8;--text3:#454f6b;--r:10px;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Familjen Grotesk',sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+nav{height:52px;background:rgba(10,11,15,.92);backdrop-filter:blur(12px);border-bottom:.5px solid var(--border);display:flex;align-items:center;padding:0 5%;gap:12px;position:sticky;top:0;z-index:50}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.nav-icon{width:28px;height:28px;background:var(--accent);border-radius:7px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#fff}
+.nav-name{font-weight:700;font-size:16px;color:var(--text)}
+.nav-back{margin-left:auto;font-size:14px;color:var(--text2);text-decoration:none;padding:6px 12px;border-radius:8px;transition:all .2s}
+.nav-back:hover{color:var(--text);background:var(--surface)}
+
+.layout{display:flex;max-width:860px;margin:40px auto;gap:24px;padding:0 20px 60px}
+
+/* Sidebar tabs */
+.tabs-col{width:200px;flex-shrink:0}
+.tabs-title{font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;padding-left:12px}
+.tab-btn{display:flex;align-items:center;gap:10px;width:100%;padding:9px 12px;border-radius:var(--r);background:none;border:none;color:var(--text2);font-family:'Familjen Grotesk',sans-serif;font-size:14px;cursor:pointer;transition:all .15s;text-align:left;margin-bottom:2px}
+.tab-btn:hover{background:var(--surface);color:var(--text)}
+.tab-btn.active{background:var(--s2);color:var(--text);font-weight:500}
+.tab-icon{font-size:16px;width:20px;text-align:center}
+
+/* Content */
+.content-col{flex:1;min-width:0}
+.tab-pane{display:none}
+.tab-pane.active{display:block}
+
+.section-title{font-family:'Instrument Serif',serif;font-style:italic;font-size:24px;color:var(--text);margin-bottom:6px}
+.section-desc{font-size:14px;color:var(--text2);margin-bottom:28px;line-height:1.6}
+
+.card{background:var(--surface);border:.5px solid var(--border2);border-radius:14px;padding:24px;margin-bottom:16px}
+.card-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px}
+
+/* Avatar upload */
+.av-section{display:flex;align-items:center;gap:20px;padding:20px;background:var(--s2);border-radius:var(--r);margin-bottom:20px}
+.av-preview{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;font-family:'Instrument Serif',serif;font-style:italic;color:#fff;cursor:pointer;overflow:hidden;position:relative;border:2px dashed var(--border2);transition:border-color .2s;flex-shrink:0}
+.av-preview:hover{border-color:var(--accent)}
+.av-preview img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+.av-actions{flex:1}
+.av-actions p{font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.5}
+.av-actions-row{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Form fields */
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;font-weight:500;color:var(--text2);margin-bottom:6px}
+.label-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.label-hint{font-size:12px;color:var(--text3)}
+.field input,.field textarea,.field select{width:100%;padding:10px 13px;background:var(--bg2);border:.5px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:'Familjen Grotesk',sans-serif;font-size:14px;outline:none;transition:border-color .2s}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent)}
+.field input.error{border-color:var(--red)}
+.field input.valid{border-color:var(--green)}
+.field textarea{resize:none;height:80px}
+.field-err{font-size:12px;color:var(--red);margin-top:4px;display:none}
+.field-err.show{display:block}
+.char-count{font-size:12px;color:var(--text3);text-align:right;margin-top:3px}
+
+/* Row */
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* Toggle */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:.5px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+.toggle-info{flex:1}
+.toggle-label{font-size:14px;font-weight:500;margin-bottom:2px}
+.toggle-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.toggle{width:42px;height:24px;border-radius:12px;background:var(--s3);border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.toggle.on{background:var(--accent)}
+.toggle::after{content:'';position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.toggle.on::after{left:21px}
+
+/* Blocked list */
+.blocked-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:.5px solid var(--border)}
+.blocked-item:last-child{border-bottom:none}
+.bl-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0}
+.bl-info{flex:1}
+.bl-name{font-size:14px;font-weight:500}
+.bl-date{font-size:12px;color:var(--text3)}
+.btn-unblock{padding:6px 13px;border-radius:8px;background:transparent;border:.5px solid var(--border2);color:var(--text2);font-family:'Familjen Grotesk',sans-serif;font-size:13px;cursor:pointer;transition:all .2s}
+.btn-unblock:hover{background:var(--s2);color:var(--text)}
+
+/* Buttons */
+.btn-primary{padding:10px 20px;border-radius:var(--r);background:var(--accent);color:#fff;border:none;font-family:'Familjen Grotesk',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-primary:hover{background:#4f46e5;transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn-ghost{padding:10px 20px;border-radius:var(--r);background:transparent;color:var(--text2);border:.5px solid var(--border2);font-family:'Familjen Grotesk',sans-serif;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-ghost:hover{background:var(--surface);color:var(--text)}
+.btn-danger{padding:10px 20px;border-radius:var(--r);background:transparent;color:var(--red);border:.5px solid rgba(244,63,94,.25);font-family:'Familjen Grotesk',sans-serif;font-size:14px;cursor:pointer;transition:all .2s}
+.btn-danger:hover{background:rgba(244,63,94,.1)}
+.btn-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+
+/* Danger zone */
+.danger-zone{border:.5px solid rgba(244,63,94,.2);border-radius:14px;padding:24px}
+.danger-zone .card-title{color:var(--red)}
+.danger-desc{font-size:14px;color:var(--text2);margin-bottom:16px;line-height:1.6}
+.danger-confirm{background:var(--bg2);border:.5px solid rgba(244,63,94,.2);border-radius:var(--r);padding:16px;margin-top:16px;display:none}
+.danger-confirm.show{display:block}
+.danger-confirm p{font-size:13px;color:var(--text2);margin-bottom:12px}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 18px;border-radius:var(--r);font-size:14px;font-weight:500;z-index:300;display:none;animation:tIn .3s ease}
+.toast.show{display:block}
+.toast.success{background:#064e3b;border:.5px solid rgba(16,185,129,.3);color:var(--green)}
+.toast.error{background:#4c0519;border:.5px solid rgba(244,63,94,.3);color:var(--red)}
+@keyframes tIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+#avatarInput,#bannerInput{display:none}
+
+/* Username check */
+.ucheck{font-size:12px;margin-top:4px;display:none}
+.ucheck.show{display:block}
+.ucheck.ok{color:var(--green)}
+.ucheck.bad{color:var(--red)}
+
+.strength-bar{height:3px;background:var(--border);border-radius:2px;margin-top:6px;overflow:hidden}
+.strength-fill{height:100%;border-radius:2px;transition:width .3s,background .3s;width:0}
+.pwd-wrap{position:relative}
+.pwd-eye{position:absolute;right:11px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px}
+
+@media(max-width:640px){.layout{flex-direction:column}.tabs-col{width:100%}.row2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/chat.html" class="nav-logo"><div class="nav-icon">C</div><div class="nav-name">ConnectMail</div></a>
+  <a href="/chat.html" class="nav-back">← Messages</a>
+</nav>
+
+<div class="layout">
+  <!-- Tabs -->
+  <div class="tabs-col">
+    <div class="tabs-title">Paramètres</div>
+    <button class="tab-btn active" onclick="switchTab('profile',this)"><span class="tab-icon">👤</span>Profil</button>
+    <button class="tab-btn" onclick="switchTab('account',this)"><span class="tab-icon">🔑</span>Compte</button>
+    <button class="tab-btn" onclick="switchTab('privacy',this)"><span class="tab-icon">🛡️</span>Confidentialité</button>
+    <button class="tab-btn" onclick="switchTab('notifications',this)"><span class="tab-icon">🔔</span>Notifications</button>
+    <button class="tab-btn" onclick="switchTab('blocked',this)"><span class="tab-icon">🚫</span>Bloqués</button>
+    <button class="tab-btn" onclick="switchTab('danger',this)"><span class="tab-icon">⚠️</span>Zone danger</button>
+  </div>
+
+  <!-- Content -->
+  <div class="content-col">
+
+    <!-- ── PROFIL ── -->
+    <div class="tab-pane active" id="tab-profile">
+      <div class="section-title">Mon profil</div>
+      <div class="section-desc">Ces informations sont visibles par les autres utilisateurs.</div>
+
+      <div class="card">
+        <div class="card-title">Photo & bannière</div>
+        <div class="av-section">
+          <div class="av-preview" id="avPreview" onclick="document.getElementById('avatarInput').click()">
+            <img id="avImg" alt="">
+            <span id="avInitials">?</span>
+          </div>
+          <div class="av-actions">
+            <p>Photo de profil — JPG, PNG, max 5 Mo. Préférer une image carrée.</p>
+            <div class="av-actions-row">
+              <button class="btn-ghost" style="padding:7px 14px;font-size:13px" onclick="document.getElementById('avatarInput').click()">Choisir une photo</button>
+              <button class="btn-ghost" style="padding:7px 14px;font-size:13px" onclick="document.getElementById('bannerInput').click()">Bannière</button>
+            </div>
+          </div>
+        </div>
+        <input type="file" id="avatarInput" accept="image/*" onchange="previewAvatar(this)">
+        <input type="file" id="bannerInput" accept="image/*">
+
+        <div class="row2">
+          <div class="field">
+            <label>Prénom</label>
+            <input type="text" id="firstName" placeholder="Marie">
+          </div>
+          <div class="field">
+            <label>Nom</label>
+            <input type="text" id="lastName" placeholder="Dupont">
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="label-row">
+            <label>Nom d'utilisateur</label>
+            <span class="label-hint" id="usernameHint"></span>
+          </div>
+          <input type="text" id="username" placeholder="marie_dupont" oninput="checkUsername(this.value)">
+          <div class="ucheck" id="ucheck"></div>
+        </div>
+
+        <div class="field">
+          <div class="label-row">
+            <label>Biographie</label>
+            <span class="label-hint" id="bioCount">0/160</span>
+          </div>
+          <textarea id="bio" placeholder="Parlez-vous en quelques mots..." oninput="document.getElementById('bioCount').textContent=this.value.length+'/160'" maxlength="160"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Localisation (optionnelle)</label>
+          <input type="text" id="location" placeholder="Paris, France">
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-primary" id="saveProfileBtn" onclick="saveProfile()">Sauvegarder</button>
+          <button class="btn-ghost" onclick="loadProfile()">Annuler</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COMPTE ── -->
+    <div class="tab-pane" id="tab-account">
+      <div class="section-title">Mon compte</div>
+      <div class="section-desc">Gérez vos informations de connexion et la sécurité.</div>
+
+      <div class="card">
+        <div class="card-title">Adresse email</div>
+        <div class="field">
+          <label>Email actuel</label>
+          <input type="email" id="currentEmail" readonly style="opacity:.6;cursor:default">
+        </div>
+        <div class="field">
+          <label>Nouvel email</label>
+          <input type="email" id="newEmail" placeholder="nouveau@email.com">
+        </div>
+        <div class="field">
+          <label>Mot de passe actuel (confirmation)</label>
+          <input type="password" id="emailConfirmPwd" placeholder="••••••••">
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="updateEmail()">Changer l'email</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Mot de passe</div>
+        <div class="field">
+          <label>Mot de passe actuel</label>
+          <div class="pwd-wrap">
+            <input type="password" id="oldPwd" placeholder="••••••••">
+            <button class="pwd-eye" onclick="togglePwd('oldPwd')">👁</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Nouveau mot de passe</label>
+          <div class="pwd-wrap">
+            <input type="password" id="newPwd" placeholder="••••••••" oninput="strengthCheck(this.value)">
+            <button class="pwd-eye" onclick="togglePwd('newPwd')">👁</button>
+          </div>
+          <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+        </div>
+        <div class="field">
+          <label>Confirmer</label>
+          <div class="pwd-wrap">
+            <input type="password" id="confirmPwd" placeholder="••••••••">
+            <button class="pwd-eye" onclick="togglePwd('confirmPwd')">👁</button>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="updatePassword()">Changer le mot de passe</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CONFIDENTIALITÉ ── -->
+    <div class="tab-pane" id="tab-privacy">
+      <div class="section-title">Confidentialité</div>
+      <div class="section-desc">Contrôlez qui peut vous contacter et voir votre activité.</div>
+
+      <div class="card">
+        <div id="privacyToggles">
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-label">Qui peut m'envoyer des messages</div>
+              <div class="toggle-desc">Désactivez pour empêcher tout le monde de vous écrire</div>
+            </div>
+            <button class="toggle on" id="tgl-messages" onclick="togglePrivacy('who_can_message',this)"></button>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-label">Afficher mon statut en ligne</div>
+              <div class="toggle-desc">Les autres voient si vous êtes connecté en temps réel</div>
+            </div>
+            <button class="toggle on" id="tgl-online" onclick="togglePrivacy('show_online_status',this)"></button>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-label">Être trouvé par email</div>
+              <div class="toggle-desc">Permettre aux autres de vous trouver via votre adresse email</div>
+            </div>
+            <button class="toggle on" id="tgl-email-search" onclick="togglePrivacy('allow_search_by_email',this)"></button>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="savePrivacy()">Sauvegarder</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── NOTIFICATIONS ── -->
+    <div class="tab-pane" id="tab-notifications">
+      <div class="section-title">Notifications</div>
+      <div class="section-desc">Choisissez quand vous souhaitez être notifié par email.</div>
+
+      <div class="card">
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Nouveaux messages non lus</div>
+            <div class="toggle-desc">Recevez un email quand vous avez des messages non lus</div>
+          </div>
+          <button class="toggle on" id="tgl-notif-msg" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Résumé quotidien</div>
+            <div class="toggle-desc">Un email récapitulatif chaque matin à 9h</div>
+          </div>
+          <button class="toggle" id="tgl-notif-daily" onclick="this.classList.toggle('on')"></button>
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="saveNotifications()">Sauvegarder</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BLOQUÉS ── -->
+    <div class="tab-pane" id="tab-blocked">
+      <div class="section-title">Utilisateurs bloqués</div>
+      <div class="section-desc">Ces personnes ne peuvent plus vous écrire ni voir votre profil.</div>
+      <div class="card">
+        <div id="blockedList"><div style="text-align:center;color:var(--text3);padding:24px;font-size:14px">Chargement...</div></div>
+      </div>
+    </div>
+
+    <!-- ── DANGER ZONE ── -->
+    <div class="tab-pane" id="tab-danger">
+      <div class="section-title">Zone danger</div>
+      <div class="section-desc">Ces actions sont irréversibles. Procédez avec prudence.</div>
+
+      <div class="danger-zone">
+        <div class="card-title">Supprimer mon compte</div>
+        <div class="danger-desc">
+          La suppression de votre compte est permanente et irréversible.<br>
+          Tous vos messages, fichiers et données seront effacés. Vous ne pourrez pas récupérer votre compte.
+        </div>
+        <button class="btn-danger" onclick="toggleDeleteConfirm()">Supprimer définitivement mon compte</button>
+
+        <div class="danger-confirm" id="deleteConfirm">
+          <p>Pour confirmer, tapez <strong>SUPPRIMER</strong> ci-dessous et entrez votre mot de passe.</p>
+          <div class="field" style="margin-bottom:10px">
+            <input type="text" id="deleteConfirmText" placeholder="Tapez SUPPRIMER">
+          </div>
+          <div class="field" style="margin-bottom:14px">
+            <input type="password" id="deleteConfirmPwd" placeholder="Votre mot de passe">
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn-ghost" onclick="toggleDeleteConfirm()">Annuler</button>
+            <button class="btn-danger" style="background:var(--red);color:#fff;border:none;font-weight:600" onclick="deleteAccount()">Supprimer définitivement</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API='/api', token=localStorage.getItem('accessToken');
+if(!token) location.href='/login.html';
+let currentUser=null, privacySettings={}, notifSettings={};
+
+async function init(){
+  try{
+    const res=await apiFetch(`${API}/auth/me`);
+    currentUser=await res.json();
+    populateProfile(currentUser);
+    document.getElementById('currentEmail').value=currentUser.email||'';
+    await loadPrivacy();
+    await loadNotifications();
+  }catch{}
+}
+
+function populateProfile(u){
+  document.getElementById('firstName').value=u.first_name||'';
+  document.getElementById('lastName').value=u.last_name||'';
+  document.getElementById('username').value=u.username||'';
+  document.getElementById('bio').value=u.bio||'';
+  document.getElementById('location').value=u.location||'';
+  document.getElementById('bioCount').textContent=(u.bio||'').length+'/160';
+  const av=document.getElementById('avPreview');
+  av.style.background=strColor(u.username||'');
+  if(u.avatar_url){
+    const img=document.getElementById('avImg');img.src=u.avatar_url;img.style.display='block';
+    document.getElementById('avInitials').style.display='none';
+  }else{
+    document.getElementById('avInitials').textContent=((u.first_name?.[0]||'')+(u.last_name?.[0]||'')).toUpperCase();
+  }
+  const lastChange=u.username_changed_at?new Date(u.username_changed_at):null;
+  const now=new Date();
+  const canChange=!lastChange||((now-lastChange)/(1000*60*60*24))>=30;
+  if(!canChange){
+    const nextDate=new Date(lastChange.getTime()+30*24*60*60*1000);
+    document.getElementById('usernameHint').textContent=`Modifiable le ${nextDate.toLocaleDateString('fr')}`;
+    document.getElementById('username').readOnly=true;
+    document.getElementById('username').style.opacity='.6';
+  }
+}
+
+function previewAvatar(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=document.getElementById('avImg');img.src=e.target.result;img.style.display='block';
+    document.getElementById('avInitials').style.display='none';
+  };
+  reader.readAsDataURL(file);
+}
+
+let uTimer;
+function checkUsername(val){
+  clearTimeout(uTimer);
+  const el=document.getElementById('ucheck');
+  if(!val||val===currentUser?.username){el.className='ucheck';return;}
+  if(!/^[a-zA-Z0-9_]{3,30}$/.test(val)){el.className='ucheck show bad';el.textContent='Format invalide';return;}
+  uTimer=setTimeout(async()=>{
+    try{
+      const res=await fetch(`${API}/auth/check-username/${val}`,{headers:{'Authorization':`Bearer ${token}`}});
+      const d=await res.json();
+      el.className=`ucheck show ${d.available?'ok':'bad'}`;
+      el.textContent=d.available?'✓ Disponible':'✗ Déjà pris';
+    }catch{}
+  },500);
+}
+
+async function saveProfile(){
+  const btn=document.getElementById('saveProfileBtn');
+  btn.disabled=true;btn.textContent='Sauvegarde...';
+  const formData=new FormData();
+  formData.append('firstName',document.getElementById('firstName').value.trim());
+  formData.append('lastName',document.getElementById('lastName').value.trim());
+  if(!document.getElementById('username').readOnly)
+    formData.append('username',document.getElementById('username').value.trim());
+  formData.append('bio',document.getElementById('bio').value.trim());
+  formData.append('location',document.getElementById('location').value.trim());
+  const avatarFile=document.getElementById('avatarInput').files[0];
+  if(avatarFile) formData.append('avatar',avatarFile);
+  const bannerFile=document.getElementById('bannerInput').files[0];
+  if(bannerFile) formData.append('banner',bannerFile);
+  try{
+    const res=await fetch(`${API}/users/me`,{method:'PUT',headers:{'Authorization':`Bearer ${token}`},body:formData});
+    if(res.ok){showToast('Profil mis à jour !','success');}
+    else{const d=await res.json();showToast(d.error||'Erreur.','error');}
+  }catch{showToast('Erreur réseau.','error');}
+  finally{btn.disabled=false;btn.textContent='Sauvegarder';}
+}
+
+function loadProfile(){init();}
+
+async function updateEmail(){
+  const newEmail=document.getElementById('newEmail').value.trim();
+  const password=document.getElementById('emailConfirmPwd').value;
+  if(!newEmail||!password){showToast('Remplissez tous les champs.','error');return;}
+  try{
+    const res=await apiFetch(`${API}/users/me/email`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({newEmail,password})});
+    if(res.ok) showToast('Email mis à jour ! Vérifiez votre nouvelle adresse.','success');
+    else{const d=await res.json();showToast(d.error||'Erreur.','error');}
+  }catch{showToast('Erreur réseau.','error');}
+}
+
+function togglePwd(id){const i=document.getElementById(id);i.type=i.type==='password'?'text':'password';}
+function strengthCheck(val){
+  let s=0;if(val.length>=8)s++;if(/[A-Z]/.test(val))s++;if(/[0-9]/.test(val))s++;if(/[^A-Za-z0-9]/.test(val))s++;
+  const f=document.getElementById('strengthFill');
+  const colors=['#f43f5e','#f59e0b','#6366f1','#10b981'];
+  f.style.width=s>0?['25%','50%','75%','100%'][s-1]:'0';
+  f.style.background=s>0?colors[s-1]:'';
+}
+
+async function updatePassword(){
+  const oldPwd=document.getElementById('oldPwd').value;
+  const newPwd=document.getElementById('newPwd').value;
+  const confirmPwd=document.getElementById('confirmPwd').value;
+  if(!oldPwd||!newPwd||!confirmPwd){showToast('Remplissez tous les champs.','error');return;}
+  if(newPwd!==confirmPwd){showToast('Les mots de passe ne correspondent pas.','error');return;}
+  if(newPwd.length<8){showToast('8 caractères minimum.','error');return;}
+  try{
+    const res=await apiFetch(`${API}/users/me/password`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({oldPassword:oldPwd,newPassword:newPwd})});
+    if(res.ok){showToast('Mot de passe modifié !','success');['oldPwd','newPwd','confirmPwd'].forEach(id=>document.getElementById(id).value='');}
+    else{const d=await res.json();showToast(d.error||'Erreur.','error');}
+  }catch{showToast('Erreur réseau.','error');}
+}
+
+async function loadPrivacy(){
+  try{
+    const res=await apiFetch(`${API}/users/me/settings`);
+    privacySettings=await res.json();
+    const msgs=privacySettings.who_can_message==='everyone';
+    const online=privacySettings.show_online_status;
+    const search=privacySettings.allow_search_by_email;
+    setToggle('tgl-messages',msgs);
+    setToggle('tgl-online',online);
+    setToggle('tgl-email-search',search);
+  }catch{}
+}
+
+function setToggle(id,on){const el=document.getElementById(id);if(el){el.classList.toggle('on',on);}}
+function togglePrivacy(key,btn){btn.classList.toggle('on');}
+
+async function savePrivacy(){
+  const settings={
+    who_can_message:document.getElementById('tgl-messages').classList.contains('on')?'everyone':'nobody',
+    show_online_status:document.getElementById('tgl-online').classList.contains('on'),
+    allow_search_by_email:document.getElementById('tgl-email-search').classList.contains('on'),
+  };
+  try{
+    const res=await apiFetch(`${API}/settings/privacy`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(settings)});
+    if(res.ok) showToast('Confidentialité mise à jour !','success');
+    else showToast('Erreur.','error');
+  }catch{showToast('Erreur réseau.','error');}
+}
+
+async function loadNotifications(){
+  try{
+    const res=await apiFetch(`${API}/users/me/settings`);
+    const s=await res.json();
+    setToggle('tgl-notif-msg',s.email_new_messages!==false);
+    setToggle('tgl-notif-daily',s.email_daily_digest===true);
+  }catch{}
+}
+
+async function saveNotifications(){
+  const settings={
+    email_new_messages:document.getElementById('tgl-notif-msg').classList.contains('on'),
+    email_daily_digest:document.getElementById('tgl-notif-daily').classList.contains('on'),
+  };
+  try{
+    const res=await apiFetch(`${API}/settings/notifications`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(settings)});
+    if(res.ok) showToast('Notifications mises à jour !','success');
+    else showToast('Erreur.','error');
+  }catch{showToast('Erreur réseau.','error');}
+}
+
+async function loadBlockedUsers(){
+  try{
+    const res=await apiFetch(`${API}/users/me/blocked`);
+    const data=await res.json();
+    const container=document.getElementById('blockedList');
+    if(!data.blocked?.length){container.innerHTML='<div style="text-align:center;color:var(--text3);padding:24px;font-size:14px">Aucun utilisateur bloqué.</div>';return;}
+    container.innerHTML=data.blocked.map(u=>`
+      <div class="blocked-item">
+        <div class="bl-av" style="background:${strColor(u.username)}">${((u.first_name?.[0]||'')+(u.last_name?.[0]||'')).toUpperCase()}</div>
+        <div class="bl-info">
+          <div class="bl-name">${esc(u.first_name+' '+u.last_name)}</div>
+          <div class="bl-date">@${esc(u.username)} · Bloqué le ${new Date(u.blocked_at).toLocaleDateString('fr')}</div>
+        </div>
+        <button class="btn-unblock" onclick="unblockUser('${u.id}','${esc(u.username)}',this)">Débloquer</button>
+      </div>`).join('');
+  }catch{}
+}
+
+async function unblockUser(userId,username,btn){
+  btn.disabled=true;btn.textContent='...';
+  try{
+    await apiFetch(`${API}/users/${userId}/block`,{method:'DELETE'});
+    showToast(`@${username} débloqué.`,'success');
+    await loadBlockedUsers();
+  }catch{showToast('Erreur.','error');btn.disabled=false;btn.textContent='Débloquer';}
+}
+
+function toggleDeleteConfirm(){document.getElementById('deleteConfirm').classList.toggle('show');}
+
+async function deleteAccount(){
+  const txt=document.getElementById('deleteConfirmText').value;
+  const pwd=document.getElementById('deleteConfirmPwd').value;
+  if(txt!=='SUPPRIMER'){showToast('Tapez exactement SUPPRIMER.','error');return;}
+  if(!pwd){showToast('Mot de passe requis.','error');return;}
+  try{
+    const res=await apiFetch(`${API}/account`,{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd})});
+    if(res.ok){localStorage.clear();location.href='/?deleted=1';}
+    else{const d=await res.json();showToast(d.error||'Mot de passe incorrect.','error');}
+  }catch{showToast('Erreur réseau.','error');}
+}
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+  btn.classList.add('active');
+  if(name==='blocked') loadBlockedUsers();
+}
+
+async function apiFetch(url,opts={}){
+  const res=await fetch(url,{...opts,headers:{'Authorization':`Bearer ${token}`,...(opts.headers||{})}});
+  if(res.status===401) location.href='/login.html';
+  return res;
+}
+
+function showToast(msg,type){const e=document.getElementById('toast');e.textContent=msg;e.className=`toast ${type} show`;setTimeout(()=>e.classList.remove('show'),3500);}
+function strColor(s){const p=['#1e1b4b','#1a2744','#1a3a2e','#3b1a2e','#1a3030','#2d1a0e','#0e2233','#2a0e33'];let h=0;for(let c of s)h=c.charCodeAt(0)+((h<<5)-h);return p[Math.abs(h)%p.length];}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+init();
+</script>
+</body>
+</html>

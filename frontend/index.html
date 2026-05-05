@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConnectMail — Messagerie moderne et sécurisée</title>
+    <meta name="description"
+        content="Envoyez des messages, documents, photos, vidéos et notes audio en temps réel. Gratuit, sécurisé et sans limite.">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap">
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%232ea043'%3E%3Cpath d='M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z'/%3E%3C/svg%3E">
+
+    <style>
+        :root {
+            --bg: #0d1117;
+            --accent-green: #2ea043;
+            --accent-blue: #58a6ff;
+            --text: #e6edf3;
+            --text-secondary: #8b949e;
+            --card: #161b22;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(13, 17, 23, 0.95);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            border-bottom: 1px solid #21262d;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+
+        .logo-dot {
+            color: var(--accent-green);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: white;
+        }
+
+        .cta-btn {
+            background: var(--accent-green);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 9999px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .cta-btn:hover {
+            background: #3fb950;
+            transform: translateY(-2px);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 160px 0 120px;
+            text-align: center;
+            background: linear-gradient(135deg, #0d1117 0%, #1a2332 100%);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.8rem, 8vw, 4.5rem);
+            line-height: 1.1;
+            margin-bottom: 24px;
+        }
+
+        .hero .highlight {
+            background: linear-gradient(90deg, #2ea043, #58a6ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.35rem;
+            max-width: 680px;
+            margin: 0 auto 40px;
+            color: var(--text-secondary);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--accent-green);
+            color: white;
+            padding: 16px 32px;
+            border-radius: 9999px;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid #58a6ff;
+            padding: 16px 32px;
+            border-radius: 9999px;
+            font-size: 1.1rem;
+        }
+
+        .mockup {
+            margin-top: 80px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid #30363d;
+        }
+
+        /* Sections */
+        section {
+            padding: 100px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.8rem;
+            margin-bottom: 60px;
+        }
+
+        /* Comment ça marche */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+        }
+
+        .step-card {
+            background: var(--card);
+            padding: 40px 30px;
+            border-radius: 16px;
+            text-align: center;
+            transition: transform 0.4s;
+        }
+
+        .step-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: var(--accent-blue);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 24px;
+        }
+
+        /* Features */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: var(--card);
+            padding: 32px;
+            border-radius: 16px;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent-green);
+            transform: translateY(-8px);
+        }
+
+        .icon {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+        }
+
+        /* Footer */
+        footer {
+            background: #0a0e14;
+            padding: 80px 0 40px;
+            border-top: 1px solid #21262d;
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- HEADER -->
+    <header>
+        <div class="container">
+            <nav>
+                <a href="/" class="logo">
+                    Connect<span class="logo-dot">Mail</span>
+                </a>
+                <div class="nav-links">
+                    <a href="#features">Fonctionnalités</a>
+                    <a href="#how">Comment ça marche</a>
+                    <a href="#security">Sécurité</a>
+                </div>
+                <div>
+                    <a href="/login" style="margin-right: 20px; color: var(--text-secondary); text-decoration: none;">Se
+                        connecter</a>
+                    <a href="/register" class="cta-btn">Créer un compte gratuit</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="container">
+            <h1>Discutez librement.<br>Partagez <span class="highlight">tout</span>.</h1>
+            <p>La messagerie moderne qui vous permet d’envoyer messages, documents, photos, vidéos et notes audio en
+                temps réel. Simple, sécurisée et gratuite.</p>
+
+            <div class="hero-buttons">
+                <a href="/register" class="btn-primary">Commencer gratuitement</a>
+                <a href="#how" class="btn-secondary">Voir comment ça marche</a>
+            </div>
+
+            <img src="https://picsum.photos/id/1015/1200/680" alt="Mockup ConnectMail" class="mockup" width="100%"
+                style="max-width: 1100px;">
+        </div>
+    </section>
+
+    <!-- COMMENT ÇA MARCHE -->
+    <section id="how">
+        <div class="container">
+            <h2 class="section-title">Comment ça marche ?</h2>
+            <div class="steps">
+                <div class="step-card fade-in">
+                    <div class="step-number">1</div>
+                    <h3>Créez votre compte</h3>
+                    <p>Inscrivez-vous en 30 secondes avec votre email ou Google.</p>
+                </div>
+                <div class="step-card fade-in">
+                    <div class="step-number">2</div>
+                    <h3>Discutez en temps réel</h3>
+                    <p>Envoyez des messages instantanés et voyez qui est en ligne.</p>
+                </div>
+                <div class="step-card fade-in">
+                    <div class="step-number">3</div>
+                    <h3>Partagez tout</h3>
+                    <p>Photos, vidéos, documents, notes audio — sans limite de taille raisonnable.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FONCTIONNALITÉS -->
+    <section id="features" style="background: #161b22;">
+        <div class="container">
+            <h2 class="section-title">Tout ce dont vous avez besoin</h2>
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <div class="icon">💬</div>
+                    <h3>Messagerie instantanée</h3>
+                    <p>Chat en temps réel avec statuts de lecture.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="icon">📄</div>
+                    <h3>Documents</h3>
+                    <p>PDF, Word, Excel jusqu'à 25 Mo.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="icon">📸</div>
+                    <h3>Photos & Images</h3>
+                    <p>Envoi instantané avec aperçu.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="icon">🎥</div>
+                    <h3>Vidéos</h3>
+                    <p>Lecteur intégré jusqu'à 100 Mo.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="icon">🎙️</div>
+                    <h3>Messages vocaux</h3>
+                    <p>Enregistrez et envoyez directement.</p>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="icon">🚫</div>
+                    <h3>Blocage puissant</h3>
+                    <p>Protégez-vous des utilisateurs indésirables.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SÉCURITÉ -->
+    <section id="security">
+        <div class="container">
+            <h2 class="section-title">Sécurité & Confidentialité</h2>
+            <div
+                style="max-width: 800px; margin: 0 auto; text-align: center; background: var(--card); padding: 60px 40px; border-radius: 20px;">
+                <h3 style="font-size: 2rem; margin-bottom: 20px;">Votre vie privée est protégée</h3>
+                <p style="font-size: 1.2rem; color: var(--text-secondary);">
+                    Chiffrement des données en transit • Blocage bidirectionnel •
+                    Contrôle total de votre visibilité • Aucune publicité •
+                    Pas de revente de données
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA FINAL -->
+    <section
+        style="background: linear-gradient(135deg, #2ea043, #58a6ff); color: white; text-align: center; padding: 120px 20px;">
+        <div class="container">
+            <h2 style="font-size: 3rem; margin-bottom: 24px;">Prêt à connecter le monde ?</h2>
+            <p style="font-size: 1.4rem; max-width: 600px; margin: 0 auto 40px;">
+                Rejoignez des milliers d’utilisateurs qui communiquent librement et en toute sécurité.
+            </p>
+            <a href="/register" class="cta-btn"
+                style="background: white; color: #0d1117; font-size: 1.3rem; padding: 18px 40px;">
+                Créer mon compte gratuit
+            </a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 40px; margin-bottom: 60px;">
+                <div>
+                    <h3 style="margin-bottom: 20px;">ConnectMail</h3>
+                    <p>La messagerie du futur, aujourd’hui.</p>
+                </div>
+                <div>
+                    <h4>Produit</h4>
+                    <p style="margin: 12px 0;">Fonctionnalités</p>
+                    <p style="margin: 12px 0;">Sécurité</p>
+                    <p style="margin: 12px 0;">Tarifs</p>
+                </div>
+                <div>
+                    <h4>Entreprise</h4>
+                    <p style="margin: 12px 0;">À propos</p>
+                    <p style="margin: 12px 0;">Blog</p>
+                    <p style="margin: 12px 0;">Contact</p>
+                </div>
+                <div>
+                    <h4>Légal</h4>
+                    <p style="margin: 12px 0;">Confidentialité</p>
+                    <p style="margin: 12px 0;">Conditions d’utilisation</p>
+                </div>
+            </div>
+            <div
+                style="text-align: center; padding-top: 30px; border-top: 1px solid #21262d; color: var(--text-secondary);">
+                © 2026 ConnectMail. Tous droits réservés.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Animation au scroll
+        function handleScroll() {
+            document.querySelectorAll('.fade-in').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight * 0.85) {
+                    el.classList.add('visible');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('load', () => {
+            handleScroll();
+        });
+
+        // Smooth scroll pour les ancres
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                if (this.getAttribute('href') !== '#') {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

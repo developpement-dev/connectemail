@@ -1,0 +1,51 @@
+version: '3.9'
+
+services:
+  app:
+    build: ./backend
+    ports:
+      - "7000:6000" # ← Port externe 7000
+    env_file:
+      - ./backend/.env
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: connectmail
+      POSTGRES_USER: connectmail
+      POSTGRES_PASSWORD: connectmail123
+    ports:
+      - "5435:5432" # ← Port externe 5435 (libre)
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6381:6379" # ← Port externe 6381 (libre)
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - app
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:

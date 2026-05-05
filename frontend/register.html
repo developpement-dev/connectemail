@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Créer un compte — ConnectMail</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080c12;--bg2:#0d1420;--surface:#131e2e;--surface2:#1a2840;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --accent:#3b82f6;--accent-h:#2563eb;
+  --green:#22c55e;--red:#ef4444;
+  --text:#e8edf5;--text2:#8b99b5;--text3:#5a6880;
+  --radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 30% 20%,rgba(59,130,246,0.08) 0%,transparent 60%);pointer-events:none}
+
+.card{width:100%;max-width:480px;background:var(--surface);border:0.5px solid var(--border2);border-radius:20px;padding:40px;animation:fadeUp .6s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;text-decoration:none}
+.logo-icon{width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:#fff;box-shadow:0 0 20px rgba(59,130,246,0.35)}
+.logo-name{font-family:'Syne',sans-serif;font-weight:800;font-size:20px;color:var(--text)}
+
+h1{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:6px}
+.subtitle{font-size:14px;color:var(--text2);margin-bottom:28px}
+.subtitle a{color:var(--accent);text-decoration:none}
+.subtitle a:hover{text-decoration:underline}
+
+.avatar-upload{display:flex;flex-direction:column;align-items:center;margin-bottom:24px;gap:10px}
+.avatar-preview{width:80px;height:80px;border-radius:50%;background:var(--surface2);border:2px dashed var(--border2);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:24px;position:relative;overflow:hidden;transition:border-color .2s}
+.avatar-preview:hover{border-color:var(--accent)}
+.avatar-preview img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
+.avatar-preview span{font-size:11px;color:var(--text3);margin-top:4px}
+#avatarInput{display:none}
+
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{margin-bottom:16px}
+label{display:block;font-size:13px;font-weight:500;color:var(--text2);margin-bottom:6px}
+.input-wrap{position:relative}
+input[type=text],input[type=email],input[type=password]{
+  width:100%;padding:11px 14px;background:var(--bg2);
+  border:0.5px solid var(--border2);border-radius:var(--radius);
+  color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;
+  transition:border-color .2s,box-shadow .2s;outline:none;
+}
+input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,0.12)}
+input.error{border-color:var(--red)}
+input.valid{border-color:var(--green)}
+.field-status{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:15px;pointer-events:none}
+.field-error{font-size:12px;color:var(--red);margin-top:5px;display:none}
+.field-error.show{display:block}
+
+.password-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;padding:0}
+
+.strength-bar{height:3px;background:var(--border);border-radius:2px;margin-top:6px;overflow:hidden}
+.strength-fill{height:100%;border-radius:2px;transition:width .3s,background .3s;width:0}
+
+.terms{display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;padding:14px;background:var(--bg2);border-radius:var(--radius);border:0.5px solid var(--border)}
+.terms input[type=checkbox]{width:16px;height:16px;margin-top:2px;flex-shrink:0;accent-color:var(--accent)}
+.terms label{font-size:13px;color:var(--text2);line-height:1.5;margin:0}
+.terms a{color:var(--accent);text-decoration:none}
+
+.btn{width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.btn:hover{background:var(--accent-h);transform:translateY(-1px);box-shadow:0 8px 24px rgba(59,130,246,0.35)}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.btn-loader{display:none;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--text3);font-size:13px}
+.divider::before,.divider::after{content:'';flex:1;height:0.5px;background:var(--border)}
+
+.btn-oauth{width:100%;padding:12px;background:transparent;border:0.5px solid var(--border2);border-radius:var(--radius);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-oauth:hover{background:var(--surface2);color:var(--text);border-color:var(--border2)}
+
+.alert{padding:12px 16px;border-radius:var(--radius);font-size:14px;margin-bottom:16px;display:none}
+.alert.success{background:rgba(34,197,94,0.1);border:0.5px solid rgba(34,197,94,0.3);color:var(--green)}
+.alert.error{background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.3);color:var(--red)}
+.alert.show{display:block}
+
+.username-check{font-size:12px;margin-top:5px;display:none}
+.username-check.show{display:block}
+.username-check.ok{color:var(--green)}
+.username-check.taken{color:var(--red)}
+</style>
+</head>
+<body>
+<div class="card">
+  <a href="/" class="logo">
+    <div class="logo-icon">C</div>
+    <div class="logo-name">ConnectMail</div>
+  </a>
+  <h1>Créer un compte</h1>
+  <p class="subtitle">Déjà inscrit ? <a href="/login">Se connecter</a></p>
+
+  <div class="alert" id="alert"></div>
+
+  <!-- Avatar -->
+  <div class="avatar-upload">
+    <div class="avatar-preview" id="avatarPreview" onclick="document.getElementById('avatarInput').click()">
+      <img id="avatarImg" alt="Avatar">
+      <span id="avatarIcon">📷</span>
+      <span id="avatarLabel" style="font-size:10px;color:var(--text3)">Photo (optionnel)</span>
+    </div>
+    <input type="file" id="avatarInput" accept="image/*">
+  </div>
+
+  <form id="registerForm" novalidate>
+    <div class="row">
+      <div class="field">
+        <label>Prénom</label>
+        <input type="text" id="firstName" name="firstName" placeholder="Marie" autocomplete="given-name">
+        <div class="field-error" id="firstNameErr"></div>
+      </div>
+      <div class="field">
+        <label>Nom</label>
+        <input type="text" id="lastName" name="lastName" placeholder="Dupont" autocomplete="family-name">
+        <div class="field-error" id="lastNameErr"></div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Nom d'utilisateur</label>
+      <div class="input-wrap">
+        <input type="text" id="username" name="username" placeholder="marie_dupont" autocomplete="username">
+        <span class="field-status" id="usernameStatus"></span>
+      </div>
+      <div class="username-check" id="usernameCheck"></div>
+      <div class="field-error" id="usernameErr"></div>
+    </div>
+
+    <div class="field">
+      <label>Adresse email</label>
+      <input type="email" id="email" name="email" placeholder="marie@exemple.com" autocomplete="email">
+      <div class="field-error" id="emailErr"></div>
+    </div>
+
+    <div class="field">
+      <label>Mot de passe</label>
+      <div class="input-wrap">
+        <input type="password" id="password" name="password" placeholder="8 caractères minimum" autocomplete="new-password">
+        <button type="button" class="password-toggle" onclick="togglePwd('password','eyePwd')">👁</button>
+      </div>
+      <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+      <div class="field-error" id="passwordErr"></div>
+    </div>
+
+    <div class="field">
+      <label>Confirmer le mot de passe</label>
+      <div class="input-wrap">
+        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Répétez le mot de passe" autocomplete="new-password">
+        <button type="button" class="password-toggle" onclick="togglePwd('confirmPassword','eyeConfirm')">👁</button>
+      </div>
+      <div class="field-error" id="confirmPasswordErr"></div>
+    </div>
+
+    <div class="terms">
+      <input type="checkbox" id="acceptTerms" name="acceptTerms">
+      <label for="acceptTerms">J'accepte les <a href="#">conditions d'utilisation</a> et la <a href="#">politique de confidentialité</a> de ConnectMail.</label>
+    </div>
+
+    <button type="submit" class="btn" id="submitBtn">
+      <span id="btnText">Créer mon compte</span>
+      <div class="btn-loader" id="btnLoader"></div>
+    </button>
+
+    <div class="divider">ou continuer avec</div>
+    <button type="button" class="btn-oauth" onclick="oauthGoogle()">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continuer avec Google
+    </button>
+  </form>
+</div>
+
+<script>
+const API = '/api/auth';
+
+// ── Avatar preview ────────────────────────────
+document.getElementById('avatarInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const img = document.getElementById('avatarImg');
+    img.src = ev.target.result;
+    img.style.display = 'block';
+    document.getElementById('avatarIcon').style.display = 'none';
+    document.getElementById('avatarLabel').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+});
+
+// ── Password toggle ───────────────────────────
+function togglePwd(id) {
+  const input = document.getElementById(id);
+  input.type = input.type === 'password' ? 'text' : 'password';
+}
+
+// ── Password strength ─────────────────────────
+document.getElementById('password').addEventListener('input', (e) => {
+  const val = e.target.value;
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const fill = document.getElementById('strengthFill');
+  const colors = ['#ef4444','#f59e0b','#3b82f6','#22c55e'];
+  const widths = ['25%','50%','75%','100%'];
+  fill.style.width = score > 0 ? widths[score-1] : '0';
+  fill.style.background = score > 0 ? colors[score-1] : '';
+});
+
+// ── Username check (debounce) ─────────────────
+let usernameTimer;
+document.getElementById('username').addEventListener('input', (e) => {
+  const val = e.target.value.trim();
+  const check = document.getElementById('usernameCheck');
+  const status = document.getElementById('usernameStatus');
+  clearTimeout(usernameTimer);
+  if (val.length < 3) { check.className = 'username-check'; status.textContent = ''; return; }
+  if (!/^[a-zA-Z0-9_]{3,30}$/.test(val)) {
+    check.className = 'username-check show taken';
+    check.textContent = '✗ Lettres, chiffres et _ uniquement';
+    status.textContent = '✗';
+    return;
+  }
+  status.textContent = '⏳';
+  usernameTimer = setTimeout(async () => {
+    try {
+      const res = await fetch(`${API}/check-username/${val}`);
+      const data = await res.json();
+      if (data.available) {
+        check.className = 'username-check show ok';
+        check.textContent = '✓ Disponible';
+        status.textContent = '✓';
+        document.getElementById('username').classList.add('valid');
+        document.getElementById('username').classList.remove('error');
+      } else {
+        check.className = 'username-check show taken';
+        check.textContent = '✗ Ce nom d\'utilisateur est déjà pris';
+        status.textContent = '✗';
+        document.getElementById('username').classList.add('error');
+        document.getElementById('username').classList.remove('valid');
+      }
+    } catch { status.textContent = ''; }
+  }, 500);
+});
+
+// ── Show error helper ─────────────────────────
+function showError(fieldId, msg) {
+  const el = document.getElementById(fieldId + 'Err');
+  const input = document.getElementById(fieldId);
+  if (!el || !input) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  input.classList.add('error');
+}
+function clearErrors() {
+  document.querySelectorAll('.field-error').forEach(el => { el.textContent = ''; el.classList.remove('show'); });
+  document.querySelectorAll('input').forEach(el => { el.classList.remove('error'); });
+}
+
+// ── Form submit ───────────────────────────────
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearErrors();
+
+  const data = {
+    firstName: document.getElementById('firstName').value.trim(),
+    lastName: document.getElementById('lastName').value.trim(),
+    username: document.getElementById('username').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    password: document.getElementById('password').value,
+    confirmPassword: document.getElementById('confirmPassword').value,
+    acceptTerms: document.getElementById('acceptTerms').checked ? 'true' : 'false',
+  };
+
+  // Validation front
+  let hasError = false;
+  if (!data.firstName) { showError('firstName', 'Prénom requis'); hasError = true; }
+  if (!data.lastName)  { showError('lastName', 'Nom requis'); hasError = true; }
+  if (!data.username)  { showError('username', 'Nom d\'utilisateur requis'); hasError = true; }
+  if (!data.email)     { showError('email', 'Email requis'); hasError = true; }
+  if (data.password.length < 8) { showError('password', '8 caractères minimum'); hasError = true; }
+  if (data.password !== data.confirmPassword) { showError('confirmPassword', 'Les mots de passe ne correspondent pas'); hasError = true; }
+  if (data.acceptTerms !== 'true') { showAlert('Vous devez accepter les conditions d\'utilisation.', 'error'); hasError = true; }
+  if (hasError) return;
+
+  setLoading(true);
+
+  try {
+    const formData = new FormData();
+    Object.entries(data).forEach(([k, v]) => formData.append(k, v));
+    const avatarFile = document.getElementById('avatarInput').files[0];
+    if (avatarFile) formData.append('avatar', avatarFile);
+
+    const res = await fetch(`${API}/register`, {
+      method: 'POST',
+      body: formData,
+    });
+    const json = await res.json();
+
+    if (res.ok) {
+      showAlert('Compte créé ! Vérifiez votre email pour activer votre compte.', 'success');
+      document.getElementById('registerForm').reset();
+      document.getElementById('avatarImg').style.display = 'none';
+      setTimeout(() => window.location.href = '/login?registered=1', 3000);
+    } else {
+      if (json.errors) {
+        json.errors.forEach(err => showError(err.path, err.msg));
+      } else {
+        showAlert(json.error || 'Une erreur est survenue.', 'error');
+      }
+    }
+  } catch (err) {
+    showAlert('Impossible de joindre le serveur. Vérifiez votre connexion.', 'error');
+  } finally {
+    setLoading(false);
+  }
+});
+
+function setLoading(on) {
+  document.getElementById('submitBtn').disabled = on;
+  document.getElementById('btnText').style.display = on ? 'none' : 'inline';
+  document.getElementById('btnLoader').style.display = on ? 'block' : 'none';
+}
+
+function showAlert(msg, type) {
+  const el = document.getElementById('alert');
+  el.textContent = msg;
+  el.className = `alert ${type} show`;
+}
+
+function oauthGoogle() {
+  window.location.href = '/api/auth/oauth/google';
+}
+</script>
+</body>
+</html>
