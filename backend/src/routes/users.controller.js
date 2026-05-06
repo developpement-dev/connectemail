@@ -1,15 +1,16 @@
 // ─────────────────────────────────────────────
 //  ConnectMail — Users Controller (Phase 5)
 // ─────────────────────────────────────────────
-const bcrypt = require('bcrypt');
-const sharp = require('sharp');
-const db = require('../db');
-const { uploadToS3 } = require('../services/storage');
+import bcrypt from 'bcrypt';
+import sharp from 'sharp';
+import db from '../utils/db.js';
+import { uploadToS3 } from '../services/storage.js';
+import redis from '../redis.js';
 
 const S3_URL = process.env.S3_PUBLIC_URL || '';
 
 // ── GET /api/users/:username ──────────────────
-exports.getProfile = async (req, res) => {
+export const getProfile = async (req, res) => {
     try {
         const { username } = req.params;
         const viewerId = req.user.id;
@@ -62,7 +63,7 @@ exports.getProfile = async (req, res) => {
 };
 
 // ── GET /api/users/me ─────────────────────────
-exports.getMe = async (req, res) => {
+export const getMe = async (req, res) => {
     try {
         const result = await db.query(
             `SELECT u.id, u.first_name, u.last_name, u.username, u.email,
@@ -79,7 +80,7 @@ exports.getMe = async (req, res) => {
 };
 
 // ── PUT /api/users/me ─────────────────────────
-exports.updateProfile = async (req, res) => {
+export const updateProfile = async (req, res) => {
     try {
         const { firstName, lastName, username, bio, location } = req.body;
         const userId = req.user.id;
@@ -127,7 +128,7 @@ exports.updateProfile = async (req, res) => {
 
         if (firstName) { fields.push(`first_name=$${i++}`); values.push(firstName.trim()); }
         if (lastName) { fields.push(`last_name=$${i++}`); values.push(lastName.trim()); }
-        if (username) { fields.push(`username=$${i++}`); values.push(username.toLowerCase()); fields.push(`username_changed_at=NOW()`); }
+        if (username) { fields.push(`username=$${i++}`); values.push(username.toLowerCase()); fields.push('username_changed_at=NOW()'); }
         if (bio !== undefined) { fields.push(`bio=$${i++}`); values.push(bio.substring(0, 160)); }
         if (location !== undefined) { fields.push(`location=$${i++}`); values.push(location.trim() || null); }
         if (avatarUrl) { fields.push(`avatar_url=$${i++}`); values.push(avatarUrl); }
@@ -146,7 +147,7 @@ exports.updateProfile = async (req, res) => {
 };
 
 // ── PUT /api/users/me/email ───────────────────
-exports.updateEmail = async (req, res) => {
+export const updateEmail = async (req, res) => {
     try {
         const { newEmail, password } = req.body;
         if (!newEmail || !password) return res.status(400).json({ error: 'Données manquantes.' });
@@ -168,7 +169,7 @@ exports.updateEmail = async (req, res) => {
 };
 
 // ── PUT /api/users/me/password ────────────────
-exports.updatePassword = async (req, res) => {
+export const updatePassword = async (req, res) => {
     try {
         const { oldPassword, newPassword } = req.body;
         if (!oldPassword || !newPassword) return res.status(400).json({ error: 'Données manquantes.' });
@@ -188,7 +189,7 @@ exports.updatePassword = async (req, res) => {
 };
 
 // ── GET /api/users/me/settings ────────────────
-exports.getSettings = async (req, res) => {
+export const getSettings = async (req, res) => {
     try {
         const result = await db.query('SELECT * FROM user_settings WHERE user_id=$1', [req.user.id]);
         if (!result.rows.length) {
@@ -202,7 +203,7 @@ exports.getSettings = async (req, res) => {
 };
 
 // ── PUT /api/settings/privacy ─────────────────
-exports.updatePrivacySettings = async (req, res) => {
+export const updatePrivacySettings = async (req, res) => {
     try {
         const { who_can_message, show_online_status, allow_search_by_email } = req.body;
         await db.query(
@@ -219,7 +220,7 @@ exports.updatePrivacySettings = async (req, res) => {
 };
 
 // ── PUT /api/settings/notifications ──────────
-exports.updateNotifSettings = async (req, res) => {
+export const updateNotifSettings = async (req, res) => {
     try {
         const { email_new_messages, email_daily_digest } = req.body;
         await db.query(
@@ -236,7 +237,7 @@ exports.updateNotifSettings = async (req, res) => {
 };
 
 // ── POST /api/users/:id/block ─────────────────
-exports.blockUser = async (req, res) => {
+export const blockUser = async (req, res) => {
     try {
         const { id: targetId } = req.params;
         if (targetId === req.user.id) return res.status(400).json({ error: 'Impossible de se bloquer soi-même.' });
@@ -267,7 +268,7 @@ exports.blockUser = async (req, res) => {
 };
 
 // ── DELETE /api/users/:id/block ───────────────
-exports.unblockUser = async (req, res) => {
+export const unblockUser = async (req, res) => {
     try {
         await db.query(
             'DELETE FROM blocked_users WHERE blocker_id=$1 AND blocked_id=$2',
@@ -291,7 +292,7 @@ exports.unblockUser = async (req, res) => {
 };
 
 // ── GET /api/users/me/blocked ─────────────────
-exports.getBlockedUsers = async (req, res) => {
+export const getBlockedUsers = async (req, res) => {
     try {
         const result = await db.query(
             `SELECT u.id, u.first_name, u.last_name, u.username, u.avatar_url, b.created_at AS blocked_at
@@ -308,7 +309,7 @@ exports.getBlockedUsers = async (req, res) => {
 };
 
 // ── POST /api/users/:id/report ────────────────
-exports.reportUser = async (req, res) => {
+export const reportUser = async (req, res) => {
     try {
         const { id: reportedId } = req.params;
         const { reason, comment } = req.body;
@@ -327,7 +328,7 @@ exports.reportUser = async (req, res) => {
 };
 
 // ── GET /api/users/search ─────────────────────
-exports.searchUsers = async (req, res) => {
+export const searchUsers = async (req, res) => {
     try {
         const q = (req.query.q || '').trim();
         const page = parseInt(req.query.page || '1');
@@ -387,7 +388,7 @@ exports.searchUsers = async (req, res) => {
 };
 
 // ── DELETE /api/account ───────────────────────
-exports.deleteAccount = async (req, res) => {
+export const deleteAccount = async (req, res) => {
     try {
         const { password } = req.body;
         if (!password) return res.status(400).json({ error: 'Mot de passe requis.' });
@@ -411,7 +412,6 @@ exports.deleteAccount = async (req, res) => {
         );
 
         // Révoquer tous les tokens Redis
-        const redis = require('../redis');
         await redis.del(`refresh:${req.user.id}`);
 
         res.json({ message: 'Compte supprimé.' });

@@ -8,4 +8,5 @@ yarn-error.log
 postgres_data/
 redis_data/
 frontend/uploads/
+prompt.md
 *.log

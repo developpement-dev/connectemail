@@ -10,6 +10,7 @@ services:
     volumes:
       - ./backend:/app
       - /app/node_modules
+      - uploads_data:/app/uploads
     depends_on:
       - postgres
       - redis
@@ -42,10 +43,12 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./frontend:/usr/share/nginx/html:ro
+      - uploads_data:/var/uploads
     depends_on:
       - app
     restart: unless-stopped
 
 volumes:
   postgres_data:
+  uploads_data:
   redis_data:

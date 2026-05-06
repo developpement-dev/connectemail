@@ -16,18 +16,16 @@ const logAdminAction = async (adminId, action, targetType, targetId, details = {
 
 export const getStats = async (req, res) => {
     try {
-        const stats = {};
-
         // Users
-        const usersCount = await db.query("SELECT COUNT(*) FROM users");
-        const activeToday = await db.query("SELECT COUNT(*) FROM users WHERE last_seen_at > NOW() - INTERVAL '24 hours'");
-        const bannedCount = await db.query("SELECT COUNT(*) FROM users WHERE status = 'banned'");
-        
+        const usersCount = await db.query('SELECT COUNT(*) FROM users');
+        const activeToday = await db.query('SELECT COUNT(*) FROM users WHERE last_seen_at > NOW() - INTERVAL \'24 hours\'');
+        const bannedCount = await db.query('SELECT COUNT(*) FROM users WHERE status = \'banned\'');
+
         // Reports
-        const pendingReports = await db.query("SELECT COUNT(*) FROM reports WHERE status = 'pending'");
+        const pendingReports = await db.query('SELECT COUNT(*) FROM reports WHERE status = \'pending\'');
 
         // Storage (Mocked for now as we need S3/Local metrics)
-        const storageUsed = "4.2 GB"; 
+        const storageUsed = '4.2 GB';
 
         res.json({
             totalUsers: parseInt(usersCount.rows[0].count),
@@ -84,12 +82,12 @@ export const banUser = async (req, res) => {
 
     try {
         await db.query(
-            "UPDATE users SET status = 'banned' WHERE id = $1",
+            'UPDATE users SET status = \'banned\' WHERE id = $1',
             [id]
         );
 
         await db.query(
-            "INSERT INTO bans (user_id, banned_by, reason, ban_type, expires_at) VALUES ($1, $2, $3, $4, $5)",
+            'INSERT INTO bans (user_id, banned_by, reason, ban_type, expires_at) VALUES ($1, $2, $3, $4, $5)',
             [id, req.user.id, reason, banType || 'permanent', expiresAt || null]
         );
 
@@ -104,8 +102,8 @@ export const banUser = async (req, res) => {
 export const unbanUser = async (req, res) => {
     const { id } = req.params;
     try {
-        await db.query("UPDATE users SET status = 'active' WHERE id = $1", [id]);
-        await db.query("UPDATE bans SET lifted_at = NOW(), lifted_by = $1 WHERE user_id = $2 AND lifted_at IS NULL", [req.user.id, id]);
+        await db.query('UPDATE users SET status = \'active\' WHERE id = $1', [id]);
+        await db.query('UPDATE bans SET lifted_at = NOW(), lifted_by = $1 WHERE user_id = $2 AND lifted_at IS NULL', [req.user.id, id]);
         
         await logAdminAction(req.user.id, 'unban_user', 'user', id, {}, req);
 
@@ -143,7 +141,7 @@ export const resolveReport = async (req, res) => {
 
     try {
         await db.query(
-            "UPDATE reports SET status = $1, admin_note = $2, resolved_by = $3, resolved_at = NOW() WHERE id = $4",
+            'UPDATE reports SET status = $1, admin_note = $2, resolved_by = $3, resolved_at = NOW() WHERE id = $4',
             [status, adminNote, req.user.id, id]
         );
 

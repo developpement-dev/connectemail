@@ -178,7 +178,7 @@ export const unblockUser = async (req, res) => {
 
   try {
     await pool.query(
-      `DELETE FROM blocked_users WHERE blocker_id = $1 AND blocked_id = $2`,
+      'DELETE FROM blocked_users WHERE blocker_id = $1 AND blocked_id = $2',
       [req.user.id, targetId]
     );
 

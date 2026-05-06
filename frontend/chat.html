@@ -773,9 +773,17 @@ async function sendMessage() {
 
     // Upload des fichiers d'abord
     if (pendingFiles.length) {
-      attachments = await uploadFiles(pendingFiles);
-      pendingFiles = [];
-      renderAttachPreview();
+      try {
+        attachments = await uploadFiles(pendingFiles);
+        pendingFiles = [];
+        renderAttachPreview();
+      } catch (uploadErr) {
+        console.error('Upload error:', uploadErr);
+        const tempEl = document.querySelector(`[data-msg-id="${tempId}"]`);
+        if (tempEl) tempEl.style.opacity = '.5';
+        alert(`Erreur d'upload: ${uploadErr.message}`);
+        return;
+      }
     }
 
     const res = await apiFetch(`${API}/messages`, {
@@ -793,7 +801,8 @@ async function sendMessage() {
     }
 
     updateConvPreview(currentConvId, realMsg);
-  } catch {
+  } catch (err) {
+    console.error('Send error:', err);
     const tempEl = document.querySelector(`[data-msg-id="${tempId}"]`);
     if (tempEl) tempEl.style.opacity = '.5';
   }
@@ -880,20 +889,40 @@ async function uploadFiles(files) {
 
     const xhr = new XMLHttpRequest();
     const result = await new Promise((resolve, reject) => {
+      // Timeout de 30 secondes par fichier
+      const timeoutId = setTimeout(() => {
+        xhr.abort();
+        reject(new Error(`Upload timeout: ${file.name}`));
+      }, 30000);
+
       xhr.upload.onprogress = (e) => {
         const pct = Math.round(e.loaded / e.total * 100);
         const bar = document.getElementById(`upf-${i}`);
         if (bar) bar.style.width = pct + '%';
       };
       xhr.onload = () => {
+        clearTimeout(timeoutId);
         if (xhr.status >= 200 && xhr.status < 300) {
           const bar = document.getElementById(`upf-${i}`);
           if (bar) { bar.style.width = '100%'; bar.style.background = 'var(--green)'; }
-          resolve(JSON.parse(xhr.responseText));
-        } else reject(new Error('Upload failed'));
+          try {
+            resolve(JSON.parse(xhr.responseText));
+          } catch (e) {
+            reject(new Error(`Invalid response: ${xhr.responseText}`));
+          }
+        } else {
+          reject(new Error(`Upload failed: ${xhr.status} ${xhr.statusText}`));
+        }
       };
-      xhr.onerror = reject;
-      xhr.open('POST', `${API}/messages/upload`);
+      xhr.onerror = (err) => {
+        clearTimeout(timeoutId);
+        reject(new Error(`Network error: ${err}`));
+      };
+      xhr.onabort = () => {
+        clearTimeout(timeoutId);
+        reject(new Error('Upload cancelled'));
+      };
+      xhr.open('POST', `${API}/upload`);
       xhr.setRequestHeader('Authorization', `Bearer ${token}`);
       xhr.send(formData);
     });

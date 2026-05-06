@@ -178,20 +178,34 @@ export const chatRouter = (io, onlineUsers) => {
             );
             const msg = msgResult.rows[0];
 
+            // Save attachments in DB
             msg.attachments = [];
-            
-            // Note: Attachment handling should link pending attachments, but frontend expects optimistic response.
-            // Simplified logic: the frontend attachments are ignored via this endpoint, it comes pre-uploaded from /api/messages/upload if there are any.
-            // Actually, in the real app, we need to handle them here if they uploaded first.
-            // For now, update the conversation's last message at.
-            
+            if (attachments && attachments.length > 0) {
+                for (const att of attachments) {
+                    const attResult = await db.query(
+                        `INSERT INTO attachments (message_id, file_name, file_url, file_type, file_size, thumbnail_url, duration)
+                         VALUES ($1, $2, $3, $4, $5, $6, $7)
+                         RETURNING id, file_name, file_url, file_type, file_size, thumbnail_url, duration`,
+                        [
+                            msg.id,
+                            att.file_name || 'fichier',
+                            att.file_url,
+                            att.file_type || 'document',
+                            att.file_size || 0,
+                            att.thumbnail_url || null,
+                            att.duration || null
+                        ]
+                    );
+                    msg.attachments.push(attResult.rows[0]);
+                }
+            }
+
             await db.query('UPDATE conversations SET last_message_at = NOW() WHERE id = $1', [conversationId]);
             await db.query('UPDATE user_conversations SET unread_count = unread_count + 1 WHERE conversation_id = $1 AND user_id != $2', [conversationId, req.user.id]);
 
-            // Real-time broadcast: Find all participants
+            // Real-time broadcast
             const participantsResult = await db.query('SELECT user_id FROM user_conversations WHERE conversation_id = $1', [conversationId]);
             participantsResult.rows.forEach(row => {
-                // Also emit to the specific conversation room for active viewing
                 io.to(`user:${row.user_id}`).emit('message:new', msg);
             });
             io.to(`conv:${conversationId}`).emit('message:new', msg);

@@ -1,7 +1,6 @@
 // backend/src/auth/auth.controller.js
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
 import { validationResult } from 'express-validator';
 import db from '../utils/db.js';
 // import redis from '../redis.js'; // Assuming it's ESM or compatible
